@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Monitoramento PE 2026 - Formulário Guiado</title>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+    .container { max-width: 1200px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    h1 { color: #003366; border-bottom: 3px solid #003366; padding-bottom: 10px; margin-top: 0; margin-bottom: 5px; }
+    .versao-titulo { font-size: 0.85em; color: #6c757d; margin-bottom: 20px; font-style: italic; }
+    .header-info { display: flex; justify-content: space-between; align-items: center; background: #eef4fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .bloco { background: #fdfdfd; border: 1px solid #dce4ec; border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+    .bloco-titulo { font-size: 1.1em; font-weight: bold; color: #005A9C; margin-bottom: 15px; display: block; border-left: 4px solid #005A9C; padding-left: 10px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+    label { display: block; font-size: 0.9em; font-weight: 600; margin-bottom: 5px; color: #444; }
+    input[type="text"], input[type="email"], input[type="number"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.95em; }
+    input[readonly], textarea[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; }
+    textarea { resize: vertical; min-height: 60px; }
+    .btn-group { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; flex-wrap: wrap; }
+    button { padding: 12px 25px; border: none; border-radius: 5px; font-size: 1em; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+    .btn-primary { background: #005A9C; color: white; }
+    .btn-success { background: #0B875B; color: white; }
+    .btn-warning { background: #e67e22; color: white; }
+    .btn-add { background: #6c757d; color: white; padding: 8px 15px; font-size: 0.9em; margin-top: 10px; }
+    .btn-add-acao { background: #6f42c1; color: white; padding: 6px 12px; font-size: 0.85em; margin-top: 8px; }
+    .btn-remove { background: #dc3545; color: white; padding: 5px 10px; font-size: 0.8em; float: right; }
+    .btn-aba { background: #dce4ec; color: #003366; padding: 10px 20px; font-size: 0.95em; border-radius: 5px 5px 0 0; margin-right: 5px; }
+    .btn-aba.ativa { background: #005A9C; color: white; }
+    .item-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #f9f9f9; }
+    .item-box h3 { margin-top: 0; font-size: 1em; color: #005A9C; }
+    .indicador-box { border: 1px dashed #17a2b8; padding: 12px; margin-top: 10px; border-radius: 4px; background: #f0f8fa; }
+    .acao-box { border: 1px dashed #6f42c1; padding: 12px; margin-top: 10px; border-radius: 4px; background: #f6f2fc; }
+    .info-qual-box { margin-top: 12px; padding-top: 10px; border-top: 1px dashed #ccc; }
+    .mapa-box { border: 1px solid #c77; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fdf6f6; }
+    .mapa-num { font-weight: bold; color: #a00; font-size: 0.9em; }
+    .mapa-problema { margin-top: 8px; padding: 10px; background: #fff; border-left: 4px solid #a00; }
+    .tap-monitoramento-box { border: 2px solid #005A9C; padding: 15px; margin-top: 15px; border-radius: 6px; background: #fff; }
+    .tap-etapas-list { list-style: none; padding-left: 0; margin-top: 10px; }
+    .tap-etapas-list li { padding: 8px; border-bottom: 1px solid #eee; display: flex; align-items: center; }
+    .tap-etapas-list input[type="checkbox"] { width: auto; margin-right: 10px; transform: scale(1.3); }
+    .tap-progress-bar { width: 100%; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+    .tap-progress-fill { height: 100%; background: #0B875B; text-align: center; color: white; font-size: 0.8em; line-height: 20px; font-weight: bold; transition: width 0.3s; }
+    .tap-tarefas-flex { display: flex; gap: 15px; margin-top: 15px; }
+    .tap-tarefas-flex > div { flex: 1; }
+    #resultado-area { display: none; margin-top: 30px; border-top: 4px dashed #005A9C; padding-top: 20px; }
+    .aviso { background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-weight: bold; }
+    .tabela-oficio { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.8em; }
+    .tabela-oficio th, .tabela-oficio td { border: 1px solid #000; padding: 6px; vertical-align: top; }
+    .tabela-oficio th { background: #e0e0e0; text-align: center; font-weight: bold; }
+    .tabela-oficio td { background: #f0f0f0; }
+    .tabela-oficio td.center { text-align: center; }
+    .titulo-tabela { color: #003366; font-weight: bold; margin-top: 25px; margin-bottom: 5px; font-size: 1em; }
+    .btn-copy { background: #6c757d; color: white; margin-top: 10px; padding: 8px 15px; font-size: 0.9em; }
+    .periodo-banner { background: linear-gradient(90deg, #003366 0%, #005A9C 100%); color: #fff; padding: 18px 25px; border-radius: 8px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+    .periodo-banner .label { font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; margin-bottom: 5px; }
+    .periodo-banner .valor { font-size: 1.5em; font-weight: bold; }
+    .btn-admin { background: rgba(255,255,255,0.2); color: #fff; border: 2px solid rgba(255,255,255,0.5); padding: 8px 15px; border-radius: 5px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
+    #texto-oficio { background: #ffffff; padding: 20px; border: 1px solid #ddd; border-radius: 5px; font-family: 'Times New Roman', serif; font-size: 1.05em; }
+    .enderecamento { margin-bottom: 25px; line-height: 1.6; }
+    .destinatario-nome { font-weight: bold; text-transform: uppercase; }
+    .recuo-tab { margin-left: 40px; }
+    #adminPanel { display: none; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+    #adminPanel.ativo { display: block; }
+    .abas { display: flex; margin-bottom: 15px; flex-wrap: wrap; }
+    .aba-conteudo { display: none; }
+    .aba-conteudo.ativa { display: block; }
+    .admin-actions { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+    .aviso-admin { background: #ffeaa7; padding: 10px; border-radius: 4px; font-size: 0.9em; margin-bottom: 15px; border-left: 4px solid #d68910; }
+    .status-sync { padding: 8px 12px; border-radius: 4px; font-size: 0.85em; margin-top: 10px; }
+    .status-ok { background: #d4edda; color: #155724; }
+    .status-erro { background: #f8d7da; color: #721c24; }
+    .status-info { background: #d1ecf1; color: #0c5460; }
+    .aviso-unidade { background: #e7f3ff; border: 1px solid #b6d4fe; color: #084298; padding: 10px 14px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9em; display: none; }
+    @media (max-width: 768px) { .grid-2, .grid-3, .tap-tarefas-flex { grid-template-columns: 1fr; flex-direction: column; } }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Monitoramento do Plano Estratégico</h1>
+    <div class="versao-titulo">Versão: v1-4 (Ajustes de Indicadores e Pré-carga de Metas)</div>
+
+    <div class="periodo-banner">
+        <div>
+            <div class="label">Período de Referência do Monitoramento</div>
+            <div class="valor" id="periodoValor">Carregando...</div>
+        </div>
+        <button class="btn-admin" id="btnAdmin" onclick="abrirAdmin()" style="display:none;">🔧 Admin (GAMPP)</button>
+    </div>
+
+    <div id="statusCarregamento" class="status-sync status-info" style="display:none;"></div>
+
+    <!-- PAINEL ADMIN (GAMPP) -->
+    <div id="adminPanel">
+        <h3 style="margin-top:0;color:#856404;">🔧 Painel de Administração - GAMPP/SEPOG</h3>
+        
+        <div class="abas">
+            <button class="btn-aba ativa" id="abaBtnMonitoramento" onclick="trocarAba('monitoramento')">Parâmetros Gerais</button>
+            <button class="btn-aba" id="abaBtnMapa" onclick="trocarAba('mapa')">Gerenciar MAPA</button>
+            <button class="btn-aba" id="abaBtnProjetos" onclick="trocarAba('projetos')">Configurar Projetos (TAP e Orçamento)</button>
+            <button class="btn-aba" id="abaBtnOficios" onclick="trocarAba('oficios')">Ofícios por Unidade</button>
+        </div>
+
+        <!-- ABA 1: PARÂMETROS GERAIS -->
+        <div id="abaMonitoramento" class="aba-conteudo ativa">
+            <div class="grid-2">
+                <div><label>Período de Referência</label><input type="text" id="inputPeriodo"></div>
+                <div><label>Ofício Base (Padrão/Global)</label><input type="text" id="inputOficio" placeholder="Usado se a unidade não tiver um ofício específico"></div>
+            </div>
+            <div class="grid-2" style="margin-top:10px;">
+                <div><label>Nome do Destinatário</label><input type="text" id="inputDestNome"></div>
+                <div><label>Cargo do Destinatário</label><input type="text" id="inputDestCargo"></div>
+            </div>
+            <div class="grid-2" style="margin-top:10px;">
+                <div><label>Gênero do Destinatário</label><select id="inputDestGenero"><option value="F">Feminino</option><option value="M">Masculino</option></select></div>
+            </div>
+            <div class="admin-actions" style="margin-top:20px;">
+                <button class="btn-success" onclick="publicarParametros()">📤 Publicar Parâmetros Gerais</button>
+            </div>
+            <div id="statusPublicacao" class="status-sync" style="display:none;"></div>
+        </div>
+
+        <!-- ABA 2: MAPA -->
+        <div id="abaMapa" class="aba-conteudo">
+            <div class="grid-3">
+                <div><label>Unidade</label><select id="mapaUnidade"></select></div>
+                <div><label>Problema ou Ameaça</label><input type="text" id="mapaProblema"></div>
+                <div><label>Acompanhamento (GAMPP)</label><input type="text" id="mapaAcompanhamento"></div>
+            </div>
+            <button class="btn-add" onclick="adicionarProblemaMAPA()">+ Cadastrar Novo Problema</button>
+            <div id="listaMAPA" style="background:#fff; padding:15px; border-radius:5px; border:1px solid #ddd; overflow-x:auto; margin-top:15px;"></div>
+            <div class="admin-actions" style="margin-top:20px;">
+                <button class="btn-success" onclick="publicarMAPACadastro()">📤 Publicar Novos Problemas</button>
+            </div>
+        </div>
+
+        <!-- ABA 3: PROJETOS -->
+        <div id="abaProjetos" class="aba-conteudo">
+            <div class="aviso-admin">
+                Defina aqui as regras de cada projeto. A <strong>Fonte</strong>, o <strong>PPA/LOA</strong>, o <strong>Recurso Previsto</strong> e as <strong>Tarefas Padrão</strong> serão carregados automaticamente e bloqueados para a unidade.
+            </div>
+            <div class="grid-2">
+                <div><label>Selecione o Projeto</label><select id="configProjSelect" onchange="carregarConfigProjeto()"></select></div>
+                <div><label>Vinculação ao PPA e LOA</label><input type="text" id="configProjPPA" placeholder="Ex.: 17.012.10.122.2070.1614"></div>
+            </div>
+            <div class="grid-3" style="margin-top:10px;">
+                <div><label>Fonte de Recurso</label><input type="text" id="configProjFonte" list="fontes-list" placeholder="Selecione ou digite..."></div>
+                <div><label>Recurso Previsto (Valor)</label><input type="text" id="configProjRecursoPrev" placeholder="Ex.: 3.000.000,00"></div>
+                <div></div>
+            </div>
+            
+            <div class="grid-3" style="margin-top:15px;">
+                <div>
+                    <label>Tarefas da Fase Inicial (Uma por linha)</label>
+                    <textarea id="configTarefasInicial" rows="5" placeholder="Estudo preliminar&#10;Projeto básico"></textarea>
+                </div>
+                <div>
+                    <label>Tarefas da Fase Intermediária (Uma por linha)</label>
+                    <textarea id="configTarefasInter" rows="5" placeholder="Licitação&#10;Execução de obra"></textarea>
+                </div>
+                <div>
+                    <label>Tarefas da Fase Final (Uma por linha)</label>
+                    <textarea id="configTarefasFinal" rows="5" placeholder="Vistoria&#10;Recebimento provisório"></textarea>
+                </div>
+            </div>
+            <div class="admin-actions" style="margin-top:15px;">
+                <button class="btn-primary" onclick="salvarProjetoConfig()">💾 Salvar Configuração do Projeto</button>
+            </div>
+            <div id="statusProjConfig" class="status-sync" style="display:none;"></div>
+        </div>
+
+        <!-- ABA 4: OFÍCIOS POR UNIDADE -->
+        <div id="abaOficios" class="aba-conteudo">
+            <div class="aviso-admin">
+                Cadastre o número do ofício que foi enviado para cada unidade. Quando o servidor da unidade for gerar o resumo, esse número aparecerá automaticamente no texto do Ofício.
+            </div>
+            <div class="grid-2">
+                <div><label>Unidade</label><select id="oficioUnidade"></select></div>
+                <div><label>Número do Ofício Enviado</label><input type="text" id="oficioNumero" placeholder="Ex.: 9327/2026/SEDAM-GAB"></div>
+            </div>
+            <button class="btn-add" onclick="adicionarOficioUnidade()">+ Vincular Ofício à Unidade</button>
+            
+            <h4 style="color:#856404;margin-top:20px;">Ofícios Cadastrados:</h4>
+            <div id="listaOficios" style="background:#fff; padding:15px; border-radius:5px; border:1px solid #ddd; overflow-x:auto; margin-top:10px;">
+                <em style="color:#888;">Nenhum ofício cadastrado ainda.</em>
+            </div>
+            <div class="admin-actions" style="margin-top:20px;">
+                <button class="btn-success" onclick="publicarOficios()">📤 Publicar Ofícios no Google</button>
+            </div>
+            <div id="statusOficios" class="status-sync" style="display:none;"></div>
+        </div>
+
+        <div class="admin-actions" style="margin-top:20px; border-top:1px solid #ddd; padding-top:15px;">
+            <button class="btn-add" style="background:#6c757d;" onclick="fecharAdmin()">✖ Fechar Painel Admin</button>
+        </div>
+    </div>
+
+    <div class="header-info">
+        <p>Preencha os dados abaixo. Ao final, gere o resumo para o Ofício e baixe a planilha.</p>
+        <p style="font-size: 0.9em; color: #555;" id="infoOficio">Carregando...</p>
+    </div>
+
+    <!-- BLOCO 1: IDENTIFICAÇÃO -->
+    <div class="bloco">
+        <span class="bloco-titulo">1. Identificação da Unidade</span>
+        <div class="grid-3">
+            <div>
+                <label for="orgao">Órgão/Secretaria (Sigla)</label>
+                <select id="orgao" required onchange="aoTrocarUnidade()">
+                    <option value="">Selecione a Unidade...</option>
+                </select>
+            </div>
+            <div>
+                <label for="responsavel">Responsável pelo Preenchimento</label>
+                <input type="text" id="responsavel" placeholder="Nome Completo" required>
+            </div>
+            <div>
+                <label for="email">E-mail Institucional</label>
+                <input type="email" id="email" placeholder="email@ro.gov.br" required>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOCO 2: RESULTADOS -->
+    <div class="bloco">
+        <span class="bloco-titulo">2. Resultados e Metas</span>
+        <div class="aviso-unidade" id="avisoResultadosUnidade">ℹ️ Selecione a unidade no Bloco 1 para ver os resultados.</div>
+        <div id="resultados-container"></div>
+        <button type="button" class="btn-add" onclick="adicionarResultado()">+ Adicionar Resultado</button>
+    </div>
+
+    <!-- BLOCO 3: PROJETOS -->
+    <div class="bloco">
+        <span class="bloco-titulo">3. Projetos e Execução</span>
+        <div class="aviso-unidade" id="avisoProjetosUnidade">ℹ️ Selecione a unidade no Bloco 1 para ver os projetos.</div>
+        <div id="projetos-container"></div>
+        <button type="button" class="btn-add" onclick="adicionarProjeto()">+ Adicionar Projeto</button>
+    </div>
+
+    <!-- BLOCO 4: MAPA -->
+    <div class="bloco" id="blocoMAPA" style="display:none; border-left: 4px solid #a00;">
+        <span class="bloco-titulo" style="border-left-color: #a00; color:#a00;">4. MAPA — Matriz de Acompanhamento de Problemas e Ameaças</span>
+        <div id="mapa-container"></div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-primary" onclick="gerarResumo()">Gerar Resumo para Ofício</button>
+        <button class="btn-success" onclick="baixarExcel()">Baixar Planilha (CSV)</button>
+        <button class="btn-warning" onclick="enviarParaGoogle()">📤 Enviar para a SEPOG</button>
+    </div>
+
+    <div id="resultado-area">
+        <div class="aviso">
+            ✅ Resumo gerado! Copie o texto e as tabelas abaixo e cole no SEI.
+            <button class="btn-copy" onclick="copiarTexto()">Copiar Texto para SEI</button>
+        </div>
+        <h2>Texto para o Ofício</h2>
+        <div id="texto-oficio"></div>
+        <div class="titulo-tabela">Tabela 1 — Resultados e Indicadores</div>
+        <div style="overflow-x:auto;"><table class="tabela-oficio" id="tabela-resultados"></table></div>
+        <div class="titulo-tabela" id="tituloTabela2">Tabela 2 — Projetos e Execução</div>
+        <div style="overflow-x:auto;"><table class="tabela-oficio" id="tabela-projetos"></table></div>
+        <div class="titulo-tabela" id="tituloTabelaMAPA" style="display:none;">Tabela 3 — MAPA (Problemas e Ameaças)</div>
+        <div style="overflow-x:auto;"><table class="tabela-oficio" id="tabela-mapa" style="display:none;"></table></div>
+    </div>
+</div>
+
+<datalist id="fontes-list"></datalist>
+
+<script>
+// =================================================================
+// CONFIGURAÇÕES E ESTADO GLOBAL
+// =================================================================
+var SENHA_ADMIN = "gampp2026";
+var URL_GOOGLE = "https://script.google.com/macros/s/AKfycbwhKwIULcrBpSUsS9yYFwc_oourW4Bb0q_Ohp3_bMfmsnXulgPG2A4KUWIqhCV8iA/exec";
+var TOKEN_ACESSO = "PE-RO-2026-A7F3B9E2C4D8F1A5B6E7C8D9A0B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8B9";
+
+var periodoReferencia = "2º Quadrimestre 2026";
+var oficioBaseGlobal = "4497/2026/SEPOG-GAMPP";
+var destinatarioNome = "JAKELINE OLIVEIRA COSTA MARCKETE";
+var destinatarioCargo = "Secretária de Estado de Planejamento, Orçamento e Gestão - SEPOG";
+var destinatarioGenero = "F";
+var MODO_ADMIN_ATIVO = false;
+
+var MAPA_CADASTRO_ADMIN = []; 
+var MAPA_RESPOSTAS_ANTERIORES = []; 
+var PROJETOS_CONFIG = {}; 
+var OFICIOS_UNIDADES = {}; 
+
+var contResultado = 0, contProjeto = 0, contIndicador = 0, contAcao = 0;
+
+var UNIDADES = ["SEAGRI","SEDEC","DER","SEOSP","SEAS","IDEP","SEDUC","SEFIN","SETIC","SEDAM","SEPAT","SESAU","SESDEC","SEJUS","PC","POLITEC","SETUR"];
+
+var FONTES_RECURSO = ["1.500 - Recursos Não Vinculados de Impostos","1.501 - Recursos Vinculados ao FUNDEB","1.540 - Recursos Vinculados à Saúde","1.550 - Recursos Vinculados à Educação","1.600 - Recursos Vinculados ao FNDE","1.700 - Recursos de Convênios com a União","1.720 - Recursos de Convênios com o Estado","1.753 - Transferências Voluntárias","2.500 - Recursos Próprios da Administração Indireta","2.501 - Recursos de Operações de Crédito","2.502 - Recursos de Alienação de Bens","2.503 - Recursos de Royalties","9.999 - A classificar pela fonte"];
+
+var CRONOGRAMA_TAP = {
+    "Desenvolvimento e Comercialização de Ativos Ambientais": { inicial: ["Estudo da Legislação Existente", "Minuta de Projeto de Lei", "Alinhamento Alta Gestão"], intermediaria: ["Aprovação da Lei", "Formação de Equipe", "Contratação de Consultoria", "Alteração de Sistemas"], final: ["Parcerias Firmadas", "Estudo de Impacto Financeiro", "Apresentação à Sociedade"], concluido: ["Implementação Final"] },
+    "Programa Avança Rondônia - PROAR": { inicial: ["Avaliações Diagnósticas", "Contratação de Empresa", "Definição de Metas"], intermediaria: ["Capacitação de Técnicos", "Aplicação da Avaliação", "Capacitação de Professores", "Formações Híbridas"], final: ["Acompanhamento Formativo", "Avaliação de Impacto"], concluido: ["Relatório de Conclusão"] },
+    "Programa Estadual de Aquisição de Alimentos": { inicial: ["Publicação de Edital", "Credenciamento de Produtores"], intermediaria: ["Diagnóstico de Comunidades", "Cadastramento", "Recebimento de Alimentos"], final: ["Fiscalização", "Prestação de Contas"], concluido: ["Encerramento Anual"] },
+    "Rondônia Mais Limpa (Implementação da Política Estadual de Resíduos Sólidos)": { inicial: ["Organização Institucional", "Questionário Base", "Diretrizes de Desativação"], intermediaria: ["Contratação de Servidores", "Visita às Prefeituras", "Capacitação Técnica", "Notificação de Municípios"], final: ["Banco de Dados", "Exigência de Encerramento"], concluido: ["Avaliação de Prazos"] }
+};
+var CRONOGRAMA_PADRAO = { inicial: ["Planejamento e Estudos", "Projeto Básico", "Processo Licitatório"], intermediaria: ["Contrato Assinado", "Execução Física", "Fiscalização"], final: ["Conclusão da Obra", "Vistoria Provisória"], concluido: ["Recebimento Definitivo", "Prestação de Contas"] };
+
+// =================================================================
+// BASES DE DADOS ATUALIZADAS (v1-4)
+// =================================================================
+var RESULTADOS = [
+    // Desenvolvimento Econômico
+    { nome: "Viabilizar o acesso a novas tecnologias para agricultores familiares", unidades: ["SEAGRI"], indicadores: ["8.962 propriedades de agricultores familiares com acesso a novas tecnologias"] },
+    { nome: "Melhoria da logística de abastecimento de alimentos", unidades: ["SEAGRI"], indicadores: ["2.015 produtores e comerciantes atendidos"] },
+    { nome: "Ampliação das indústrias do estado de Rondônia", unidades: ["SEDEC"], indicadores: ["23.374 indústrias instaladas"] },
+    { nome: "Expansão em US$ FOB do valor de produtos exportados", unidades: ["SEDEC"], indicadores: ["US$ FOB 4.432.820.838,00"] },
+    { nome: "35% da malha rodoviária do Estado pavimentada", unidades: ["DER"], indicadores: ["107,51 km pavimentados"] },
+    { nome: "100% da malha rodoviária do estado conservada", unidades: ["DER"], indicadores: ["100% de km conservado (pavimentados e não pavimentados)"] },
+    { nome: "Viabilizar a inclusão de municípios do Estado no mapa do turismo brasileiro", unidades: ["SETUR"], indicadores: ["32 municípios do Estado no mapa turístico", "126 empresas cadastradas", "159.000 visitações"] },
+    // Cidadania
+    { nome: "Famílias com acesso ou melhoria à habitação social", unidades: ["SEAS"], indicadores: ["10 mil unidades habitacionais entregues"] },
+    { nome: "Refeições nutricionalmente adequadas...", unidades: ["SEAS"], indicadores: ["10 milhões de refeições fornecidas"] },
+    { nome: "Pessoas em vulnerabilidade social capacitadas...", unidades: ["SEAS"], indicadores: ["40 mil pessoas qualificadas integralmente"] },
+    // Educação
+    { nome: "Oferta de cursos profissionalizantes...", unidades: ["IDEP"], indicadores: ["70.500 matrículas nos cursos técnicos de nível médio, qualificação profissional e formação inicial"] },
+    { nome: "Ofertar qualificação profissional para o sistema prisional", unidades: ["IDEP"], indicadores: ["1.500 matrículas nos cursos de qualificação profissional e formação inicial"] },
+    { nome: "Elevação do Desempenho de Proficiência...", unidades: ["SEDUC"], indicadores: [
+        "40% de proficiência em Língua Portuguesa no Ensino Fundamental",
+        "20% de proficiência em Matemática no Ensino Fundamental",
+        "30% de proficiência em Língua Portuguesa no Ensino Médio",
+        "15% de proficiência em Matemática no Ensino Médio"
+    ] },
+    // Gestão Estratégica
+    { nome: "Aumento da arrecadação de impostos", unidades: ["SEFIN"], indicadores: ["R$ 10.108.465.678,00 de arrecadação"] },
+    { nome: "Crescimento dos recursos de hardware...", unidades: ["SETIC"], indicadores: ["150% no índice de capacidade de armazenamento"] },
+    { nome: "Fornecer o link de INFOVIA...", unidades: ["SETIC"], indicadores: ["9 cidades atendidas com a INFOVIA"] },
+    { nome: "Melhoria da qualidade dos serviços digitais...", unidades: ["SETIC"], indicadores: ["Índice 135 em maturidade ABEP-TIC"] },
+    // Meio Ambiente
+    { nome: "Encerramento dos lixões e ações de resíduos sólidos", unidades: ["SEDAM"], indicadores: [
+        "26 lixões encerrados",
+        "26 vistorias realizadas em lixões encerrados",
+        "125 servidores da SEDAM e dos municípios capacitados",
+        "52 diagnósticos de áreas de lixões"
+    ] },
+    { nome: "Áreas rurais regularizadas", unidades: ["SEPAT"], indicadores: [
+        "100 mil hectares rurais georreferenciados",
+        "3 mil vistorias em lotes",
+        "12 mil pendências em lotes reduzidas",
+        "100 núcleos urbanos e secundários destinados",
+        "12 mil documentos titulatórios emitidos",
+        "08 convênios/termos formalizados"
+    ] },
+    { nome: "Núcleos urbanos regularizados", unidades: ["SEPAT"], indicadores: [
+        "4.150 lotes regularizados",
+        "2.550 imóveis titulados"
+    ] },
+    // Saúde
+    { nome: "Unidades de Saúde em pleno funcionamento (HEURO/CEPEM)", unidades: ["SESAU"], indicadores: ["100% das Unidades de Saúde em pleno funcionamento"] },
+    { nome: "Unidades de Saúde em pleno funcionamento (HICD/CEMETRON...)", unidades: ["SESAU"], indicadores: ["100% das Unidades de Saúde em pleno funcionamento"] },
+    // Segurança Pública
+    { nome: "Redução de homicídios dolosos", unidades: ["SESDEC"], indicadores: ["Taxa de 21,7 homicídios por 100 mil habitantes"] },
+    { nome: "Redução de roubos", unidades: ["SESDEC"], indicadores: ["Taxa de 834,8 roubos consumados por 100 mil habitantes"] },
+    { nome: "Redução de lesões corporais - violência doméstica", unidades: ["SESDEC"], indicadores: ["Taxa de 242,3 lesões corporais por 100 mil habitantes"] },
+    { nome: "Redução da violência no campo", unidades: ["SESDEC"], indicadores: ["Taxa de 40,3 crimes de violência no campo"] },
+    { nome: "Edificações da Segurança Pública", unidades: ["SESDEC"], indicadores: ["100% da quantidade de ampliação, adequação e modernização de edificações"] },
+    { nome: "Central de Monitoração Eletrônica...", unidades: ["SEJUS"], indicadores: ["75% de pessoas monitoradas com tornozeleiras eletrônicas"] },
+    { nome: "Complexo de Perícias Criminais", unidades: ["POLITEC"], indicadores: [
+        "IPA=1 no índice de produtividade anual",
+        "100% dos laboratórios instalados"
+    ] }
+];
+
+var PROJETOS = [
+    { nome: "Programa Estadual de Aquisição de Alimentos", unidades: ["SEAGRI"] },
+    { nome: "(SEDEC) Execução do Plano Estadual de Logística e Transporte (PELT)", unidades: ["SEDEC"] },
+    { nome: "(DER) RO-370: Trecho entre Cabixi até o Estado do Mato Grosso", unidades: ["DER"] },
+    { nome: "(DER) RO-370 (Continuação): Trecho de Trevo da Pedra à Parecis", unidades: ["DER"] },
+    { nome: "(DER) RO-447 (Expresso Porto): Trecho entre BR 364 e RO-005", unidades: ["DER"] },
+    { nome: "(DER) RO-005 Trecho entre acesso Bertolini...", unidades: ["DER"] },
+    { nome: "Execução da pavimentação da RO-420... Lote 1", unidades: ["DER"] },
+    { nome: "(DER) Execução da pavimentação da RO-420... Lote 2", unidades: ["DER"] },
+    { nome: "(SEOSP) Remodelação do Estádio Aluízio Ferreira", unidades: ["SEOSP"] },
+    { nome: "Projeto de concessão de subsídio (Programa Meu Sonho)", unidades: ["SEAS"] },
+    { nome: "Rede Prato Fácil", unidades: ["SEAS"] },
+    { nome: "Programa Vencer", unidades: ["SEAS"] },
+    { nome: "Expansão e Fortalecimento da Educação Profissional", unidades: ["IDEP"] },
+    { nome: "Oferta de Cursos de Qualificação Profissional no Sistema Prisional", unidades: ["IDEP"] },
+    { nome: "Programa Avança Rondônia - PROAR", unidades: ["SEDUC"] },
+    { nome: "Implantação da Sistemática de Categorização dos Contribuintes", unidades: ["SEFIN"] },
+    { nome: "Desenvolvimento e Comercialização de Ativos Ambientais", unidades: ["SEFIN"] },
+    { nome: "Ampliação da Nuvem (Cloud)", unidades: ["SETIC"] },
+    { nome: "Expansão da Infovia, Rondônia Integrada", unidades: ["SETIC"] },
+    { nome: "Portal Único de Serviços ao Cidadão", unidades: ["SETIC"] },
+    { nome: "Rondônia Mais Limpa", unidades: ["SEDAM"] },
+    { nome: "Áreas rurais regularizadas", unidades: ["SEPAT"] },
+    { nome: "Projeto Meu Imóvel Legal - Urbano", unidades: ["SEPAT"] },
+    { nome: "(SESAU) Conclusão do HEURO", unidades: ["SESAU"] },
+    { nome: "(SESAU) Construção do Laboratório Hepatites CEPEM", unidades: ["SESAU"] },
+    { nome: "(SESAU) Reforma do CEMETRON", unidades: ["SESAU"] },
+    { nome: "(SESAU) Hospital Regional de Guajará-Mirim", unidades: ["SESAU"] },
+    { nome: "(SESAU) Reforma do HICD", unidades: ["SESAU"] },
+    { nome: "(SESAU) Hospital Regional de Ariquemes", unidades: ["SESAU"] },
+    { nome: "Finalização da Construção do CIOP", unidades: ["SESDEC"] },
+    { nome: "Ampliação do Videomonitoramento", unidades: ["SESDEC"] },
+    { nome: "(SEJUS) Central de Monitoração Eletrônica", unidades: ["SEJUS"] },
+    { nome: "Delegacia da Mulher 24h", unidades: ["PC"] },
+    { nome: "(POLITEC) Ampliação do Instituto de DNA Criminal", unidades: ["POLITEC"] }
+];
+
+// =================================================================
+// HELPERS
+// =================================================================
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+function unidadeAtual() { var s = document.getElementById('orgao'); return s ? s.value : ''; }
+function filtrarPorUnidade(lista, unidade) { return unidade ? lista.filter(function(i) { return i.unidades.includes(unidade); }) : []; }
+
+// =================================================================
+// CARREGAMENTO INICIAL
+// =================================================================
+function carregarDados() {
+    var status = document.getElementById('statusCarregamento');
+    status.style.display = 'block';
+    status.className = 'status-sync status-info';
+    status.textContent = 'Carregando dados do sistema...';
+
+    fetch(URL_GOOGLE + "?token=" + encodeURIComponent(TOKEN_ACESSO) + "&acao=carregar")
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.result === 'success') {
+                if (data.parametros) aplicarParametros(data.parametros);
+                if (data.projetos_config) PROJETOS_CONFIG = data.projetos_config;
+                if (data.oficios_unidades) OFICIOS_UNIDADES = data.oficios_unidades;
+                
+                status.className = 'status-sync status-ok';
+                status.textContent = '✅ Base central carregada.';
+                setTimeout(function(){ status.style.display = 'none'; }, 2000);
+            } else {
+                throw new Error(data.message);
+            }
+        })
+        .catch(function(err) {
+            aplicarParametros({ periodo_referencia: periodoReferencia, oficio_base: oficioBaseGlobal, destinatario_nome: destinatarioNome, destinatario_cargo: destinatarioCargo, destinatario_genero: destinatarioGenero });
+            status.className = 'status-sync status-erro';
+            status.textContent = '⚠️ Modo Offline: ' + err.message;
+            setTimeout(function(){ status.style.display = 'none'; }, 5000);
+        });
+}
+
+function aplicarParametros(p) {
+    if (p.periodo_referencia) periodoReferencia = p.periodo_referencia;
+    if (p.oficio_base) oficioBaseGlobal = p.oficio_base;
+    if (p.destinatario_nome) destinatarioNome = p.destinatario_nome;
+    if (p.destinatario_cargo) destinatarioCargo = p.destinatario_cargo;
+    if (p.destinatario_genero) destinatarioGenero = p.destinatario_genero;
+    document.getElementById('periodoValor').textContent = periodoReferencia;
+    document.getElementById('infoOficio').textContent = "Ofício Global: " + oficioBaseGlobal;
+}
+
+// =================================================================
+// PAINEL ADMIN
+// =================================================================
+function abrirAdmin() {
+    var s = prompt("Senha Admin:"); if(s !== SENHA_ADMIN) return alert("Erro.");
+    document.getElementById('adminPanel').classList.add('ativo');
+    document.getElementById('btnAdmin').style.display = 'none';
+    
+    document.getElementById('inputPeriodo').value = periodoReferencia;
+    document.getElementById('inputOficio').value = oficioBaseGlobal;
+    document.getElementById('inputDestNome').value = destinatarioNome;
+    document.getElementById('inputDestCargo').value = destinatarioCargo;
+    document.getElementById('inputDestGenero').value = destinatarioGenero;
+
+    var selMapa = document.getElementById('mapaUnidade');
+    var selConfig = document.getElementById('configProjSelect');
+    var selOficio = document.getElementById('oficioUnidade');
+    
+    if (selMapa.options.length <= 1) {
+        UNIDADES.forEach(function(u){ var o = document.createElement('option'); o.value = u; o.textContent = u; selMapa.appendChild(o); });
+    }
+    if (selOficio.options.length === 0) {
+        UNIDADES.forEach(function(u){ var o = document.createElement('option'); o.value = u; o.textContent = u; selOficio.appendChild(o); });
+    }
+    if (selConfig.options.length === 0) {
+        selConfig.innerHTML = '<option value="">Selecione o Projeto...</option>';
+        PROJETOS.forEach(function(p){ selConfig.innerHTML += '<option value="' + escapeHtml(p.nome) + '">' + escapeHtml(p.nome) + '</option>'; });
+    }
+
+    carregarAdminMAPA();
+    renderizarOficios();
+}
+
+function fecharAdmin() {
+    document.getElementById('adminPanel').classList.remove('ativo');
+    if (MODO_ADMIN_ATIVO) document.getElementById('btnAdmin').style.display = 'block';
+}
+
+function trocarAba(aba) {
+    document.querySelectorAll('.aba-conteudo').forEach(function(el){ el.classList.remove('ativa'); });
+    document.querySelectorAll('.btn-aba').forEach(function(el){ el.classList.remove('ativa'); });
+    
+    var map = {
+        'monitoramento': { c: 'abaMonitoramento', b: 'abaBtnMonitoramento' },
+        'mapa': { c: 'abaMapa', b: 'abaBtnMapa' },
+        'projetos': { c: 'abaProjetos', b: 'abaBtnProjetos' },
+        'oficios': { c: 'abaOficios', b: 'abaBtnOficios' }
+    };
+    
+    if (map[aba]) {
+        document.getElementById(map[aba].c).classList.add('ativa');
+        document.getElementById(map[aba].b).classList.add('ativa');
+    }
+}
+
+// --- PARÂMETROS ---
+function publicarParametros() {
+    var status = document.getElementById('statusPublicacao');
+    status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Salvando...';
+    
+    var formParam = new URLSearchParams();
+    formParam.append('token', TOKEN_ACESSO);
+    formParam.append('tipo', 'publicar_parametros');
+    formParam.append('periodo_referencia', document.getElementById('inputPeriodo').value);
+    formParam.append('oficio_base', document.getElementById('inputOficio').value);
+    formParam.append('destinatario_nome', document.getElementById('inputDestNome').value);
+    formParam.append('destinatario_cargo', document.getElementById('inputDestCargo').value);
+    formParam.append('destinatario_genero', document.getElementById('inputDestGenero').value);
+
+    fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formParam.toString() })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.result === 'success') {
+            status.className = 'status-sync status-ok'; status.textContent = '✅ Parâmetros salvos.';
+            periodoReferencia = document.getElementById('inputPeriodo').value;
+            oficioBaseGlobal = document.getElementById('inputOficio').value;
+        } else { throw new Error(data.message); }
+    }).catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
+}
+
+// --- CONFIGURAÇÃO DE PROJETOS ---
+function carregarConfigProjeto() {
+    var nome = document.getElementById('configProjSelect').value;
+    if (!nome) return;
+    
+    var config = PROJETOS_CONFIG[nome];
+    if (config) {
+        document.getElementById('configProjPPA').value = config.ppa_loa || '';
+        document.getElementById('configProjFonte').value = config.fonte || '';
+        document.getElementById('configProjRecursoPrev').value = config.recurso_previsto || '';
+        document.getElementById('configTarefasInicial').value = (config.fases.inicial || []).join('\n');
+        document.getElementById('configTarefasInter').value = (config.fases.intermediaria || []).join('\n');
+        document.getElementById('configTarefasFinal').value = (config.fases.final || []).join('\n');
+    } else {
+        document.getElementById('configProjPPA').value = '';
+        document.getElementById('configProjFonte').value = '';
+        document.getElementById('configProjRecursoPrev').value = '';
+        document.getElementById('configTarefasInicial').value = (CRONOGRAMA_PADRAO.inicial).join('\n');
+        document.getElementById('configTarefasInter').value = (CRONOGRAMA_PADRAO.intermediaria).join('\n');
+        document.getElementById('configTarefasFinal').value = (CRONOGRAMA_PADRAO.final).join('\n');
+    }
+}
+
+function salvarProjetoConfig() {
+    var nome = document.getElementById('configProjSelect').value;
+    if (!nome) return alert("Selecione um projeto.");
+    
+    var status = document.getElementById('statusProjConfig');
+    status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Salvando...';
+
+    var config = {
+        ppa_loa: document.getElementById('configProjPPA').value,
+        fonte: document.getElementById('configProjFonte').value,
+        recurso_previsto: document.getElementById('configProjRecursoPrev').value,
+        fases: {
+            inicial: document.getElementById('configTarefasInicial').value.split('\n').filter(Boolean),
+            intermediaria: document.getElementById('configTarefasInter').value.split('\n').filter(Boolean),
+            final: document.getElementById('configTarefasFinal').value.split('\n').filter(Boolean),
+            concluido: ["Implementação Final"]
+        }
+    };
+
+    var formData = new URLSearchParams();
+    formData.append('token', TOKEN_ACESSO);
+    formData.append('tipo', 'salvar_projeto_config');
+    formData.append('nome_projeto', nome);
+    formData.append('config_json', JSON.stringify(config));
+
+    fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.result === 'success') {
+            status.className = 'status-sync status-ok'; status.textContent = '✅ Configuração salva!';
+            PROJETOS_CONFIG[nome] = config;
+        } else { throw new Error(data.message); }
+    }).catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
+}
+
+// --- OFÍCIOS POR UNIDADE ---
+function adicionarOficioUnidade() {
+    var unidade = document.getElementById('oficioUnidade').value;
+    var numero = document.getElementById('oficioNumero').value.trim();
+    if (!unidade || !numero) return alert("Preencha unidade e número do ofício.");
+    
+    OFICIOS_UNIDADES[unidade] = numero;
+    document.getElementById('oficioNumero').value = '';
+    renderizarOficios();
+    alert("Ofício vinculado localmente. Clique em 'Publicar Ofícios no Google' para salvar.");
+}
+
+function removerOficioUnidade(unidade) {
+    if (!confirm("Remover o ofício da unidade " + unidade + "?")) return;
+    delete OFICIOS_UNIDADES[unidade];
+    renderizarOficios();
+    alert("Removido localmente. Clique em 'Publicar Ofícios no Google' para salvar.");
+}
+
+function renderizarOficios() {
+    var div = document.getElementById('listaOficios');
+    var keys = Object.keys(OFICIOS_UNIDADES);
+    if (keys.length === 0) { div.innerHTML = '<em style="color:#888;">Nenhum ofício cadastrado ainda.</em>'; return; }
+    
+    var html = '<table style="width:100%; border-collapse:collapse; font-size:0.9em;"><thead><tr style="background:#e0e0e0;"><th>Unidade</th><th>Ofício</th><th>Ação</th></tr></thead><tbody>';
+    keys.sort().forEach(function(u) {
+        html += '<tr><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(u) + '</td><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(OFICIOS_UNIDADES[u]) + '</td><td style="border:1px solid #ccc; padding:6px; text-align:center;"><button type="button" class="btn-remove" style="float:none;" onclick="removerOficioUnidade(\'' + u + '\')">Remover</button></td></tr>';
+    });
+    html += '</tbody></table>';
+    div.innerHTML = html;
+}
+
+function publicarOficios() {
+    var status = document.getElementById('statusOficios');
+    status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Publicando...';
+
+    var formData = new URLSearchParams();
+    formData.append('token', TOKEN_ACESSO);
+    formData.append('tipo', 'publicar_oficios');
+    formData.append('oficios_json', JSON.stringify(OFICIOS_UNIDADES));
+
+    fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.result === 'success') {
+            status.className = 'status-sync status-ok'; status.textContent = '✅ Ofícios salvos!';
+        } else { throw new Error(data.message); }
+    }).catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
+}
+
+// =================================================================
+// LÓGICA DA UNIDADE
+// =================================================================
+function aoTrocarUnidade() {
+    var unidade = unidadeAtual();
+    var avisoRes = document.getElementById('avisoResultadosUnidade');
+    var avisoProj = document.getElementById('avisoProjetosUnidade');
+    
+    if (unidade) {
+        if(avisoRes) avisoRes.style.display = 'none';
+        if(avisoProj) avisoProj.style.display = 'none';
+        
+        var oficioDaUnidade = OFICIOS_UNIDADES[unidade] || oficioBaseGlobal;
+        document.getElementById('infoOficio').textContent = "Ofício Base: " + oficioDaUnidade;
+    } else {
+        if(avisoRes) avisoRes.style.display = 'block';
+        if(avisoProj) avisoProj.style.display = 'block';
+        var bMAPA = document.getElementById('blocoMAPA');
+        if(bMAPA) bMAPA.style.display = 'none';
+        return;
+    }
+
+    var selRes = document.querySelectorAll('[id^="res-resultado-"]');
+    for (var i = 0; i < selRes.length; i++) {
+        var atual = selRes[i].value;
+        var novoHtml = '<option value="">Selecione o Resultado...</option>';
+        var lista = filtrarPorUnidade(RESULTADOS, unidade);
+        for (var j = 0; j < lista.length; j++) novoHtml += '<option value="' + escapeHtml(lista[j].nome) + '">' + escapeHtml(lista[j].nome) + '</option>';
+        selRes[i].innerHTML = novoHtml;
+        for (var k = 0; k < selRes[i].options.length; k++) if (selRes[i].options[k].value === atual) selRes[i].selectedIndex = k;
+    }
+
+    var selProj = document.querySelectorAll('[id^="proj-nome-"]');
+    for (var p = 0; p < selProj.length; p++) {
+        var atualP = selProj[p].value;
+        var novoHtmlP = '<option value="">Selecione o Projeto...</option>';
+        var listaP = filtrarPorUnidade(PROJETOS, unidade);
+        for (var q = 0; q < listaP.length; q++) novoHtmlP += '<option value="' + escapeHtml(listaP[q].nome) + '">' + escapeHtml(listaP[q].nome) + '</option>';
+        selProj[p].innerHTML = novoHtmlP;
+        for (var r = 0; r < selProj[p].options.length; r++) if (selProj[p].options[r].value === atualP) selProj[p].selectedIndex = r;
+    }
+
+    carregarMAPAUnidade(unidade);
+}
+
+function adicionarResultado() {
+    if (!unidadeAtual()) { alert('Selecione a unidade primeiro.'); return; }
+    contResultado++;
+    var id = contResultado;
+    var div = document.createElement('div');
+    div.className = 'item-box'; div.id = 'res-box-' + id;
+    
+    var lista = filtrarPorUnidade(RESULTADOS, unidadeAtual());
+    var opcoesResultado = '<option value="">Selecione o Resultado...</option>';
+    for (var i = 0; i < lista.length; i++) opcoesResultado += '<option value="' + escapeHtml(lista[i].nome) + '">' + escapeHtml(lista[i].nome) + '</option>';
+    
+    div.innerHTML = 
+        '<button type="button" class="btn-remove" onclick="removerItem(\'res-box-' + id + '\')">Remover</button>' +
+        '<h3>Resultado #' + id + '</h3>' +
+        '<div><label>Resultado Estratégico</label><select id="res-resultado-' + id + '" onchange="carregarIndicadores(' + id + ')">' + opcoesResultado + '</select></div>' +
+        '<div id="indicadores-container-' + id + '" style="margin-top:12px;"></div>' +
+        '<div class="info-qual-box"><label>Informações Qualitativas</label><textarea id="res-info-' + id + '"></textarea></div>';
+    document.getElementById('resultados-container').appendChild(div);
+}
+
+function carregarIndicadores(idResultado) {
+    var nome = document.getElementById('res-resultado-' + idResultado).value;
+    var container = document.getElementById('indicadores-container-' + idResultado);
+    container.innerHTML = '';
+    if (!nome) return;
+    var res = RESULTADOS.find(function(r){ return r.nome === nome; });
+    if (res) {
+        res.indicadores.forEach(function(ind){
+            contIndicador++;
+            var idInd = contIndicador;
+            var div = document.createElement('div');
+            div.className = 'indicador-box'; div.id = 'ind-box-' + idInd;
+            
+            // Lógica de pré-preenchimento da meta
+            var metaTexto = ind;
+            if (!ind.toLowerCase().includes('até 2027')) {
+                metaTexto = ind + ' até 2027';
+            }
+
+            div.innerHTML = '<div class="ind-titulo">Indicador</div>' +
+                '<div><input type="text" id="ind-nome-' + idInd + '" value="' + escapeHtml(ind) + '" readonly></div>' +
+                '<div class="grid-3" style="margin-top:10px;">' +
+                    '<div><label>Meta 2027</label><input type="text" id="ind-meta2027-' + idInd + '" value="' + escapeHtml(metaTexto) + '"></div>' +
+                    '<div><label>Meta 2026</label><input type="text" id="ind-meta2026-' + idInd + '"></div>' +
+                    '<div><label>Valor Alcançado</label><input type="text" id="ind-valor-' + idInd + '"></div>' +
+                '</div>';
+            container.appendChild(div);
+        });
+    }
+}
+
+function adicionarProjeto() {
+    if (!unidadeAtual()) { alert('Selecione a unidade primeiro.'); return; }
+    contProjeto++;
+    var id = contProjeto;
+    var div = document.createElement('div');
+    div.className = 'item-box'; div.id = 'proj-box-' + id;
+    
+    var lista = filtrarPorUnidade(PROJETOS, unidadeAtual());
+    var opcoesProjeto = '<option value="">Selecione o Projeto...</option>';
+    for (var i = 0; i < lista.length; i++) opcoesProjeto += '<option value="' + escapeHtml(lista[i].nome) + '">' + escapeHtml(lista[i].nome) + '</option>';
+    
+    div.innerHTML = 
+        '<button type="button" class="btn-remove" onclick="removerItem(\'proj-box-' + id + '\')">Remover</button>' +
+        '<h3>Projeto #' + id + '</h3>' +
+        '<div><label>Nome do Projeto</label><select id="proj-nome-' + id + '" onchange="atualizarTarefasProjeto(' + id + ')">' + opcoesProjeto + '</select></div>' +
+        
+        '<div class="tap-monitoramento-box" id="tap-box-' + id + '" style="display:none;">' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
+                '<label>Monitoramento TAP e Orçamento</label>' +
+                '<label style="cursor:pointer; font-size:0.85em; color:#005A9C;"><input type="checkbox" id="tap-manual-check-' + id + '" onchange="toggleManualPct(' + id + ')"> Ajustar % Manualmente</label>' +
+            '</div>' +
+            
+            '<div id="tap-area-auto-' + id + '">' +
+                '<div style="margin-bottom:10px;"><label>Fase Atual</label><select id="tap-fase-' + id + '" onchange="mudarFaseProjeto(' + id + ')"><option value="inicial">Fase Inicial (0-25%)</option><option value="intermediaria">Fase Intermediária (26-75%)</option><option value="final">Fase Final (76-99%)</option><option value="concluido">Concluído (100%)</option></select></div>' +
+                '<div id="tap-etapas-container-' + id + '"></div>' +
+                '<div class="tap-progress-bar"><div class="tap-progress-fill" id="tap-progress-' + id + '">0%</div></div>' +
+            '</div>' +
+
+            '<div id="tap-area-manual-' + id + '" style="display:none; border-top:1px dashed #ccc; padding-top:10px;">' +
+                '<div class="grid-3">' +
+                    '<div><label>% de Execução</label><input type="number" id="tap-manual-val-' + id + '" min="0" max="100" value="0" onchange="atualizarBarraManual(' + id + ')"></div>' +
+                    '<div><label>Tarefa Atual</label><input type="text" id="tap-atual-' + id + '"></div>' +
+                    '<div><label>Próxima Tarefa</label><input type="text" id="tap-proxima-' + id + '"></div>' +
+                '</div>' +
+                '<div class="tap-progress-bar"><div class="tap-progress-fill" id="tap-progress-manual-' + id + '" style="width:0%">0%</div></div>' +
+            '</div>' +
+        '</div>' +
+
+        '<div id="acoes-container-' + id + '" style="margin-top:12px;"></div>' +
+        '<button type="button" class="btn-add-acao" onclick="adicionarAcaoOrcamentaria(' + id + ')">+ Adicionar Ação Orçamentária Extra</button>' +
+        
+        '<div class="info-qual-box">' +
+            '<label>Dificuldades Encontradas</label><textarea id="proj-dificuldade-' + id + '"></textarea>' +
+            '<label style="margin-top:10px;">Melhorias / Boas Práticas</label><textarea id="proj-melhoria-' + id + '"></textarea>' +
+            '<label style="margin-top:10px;">Ações Necessárias</label><textarea id="proj-acoes-' + id + '"></textarea>' +
+        '</div>';
+    document.getElementById('projetos-container').appendChild(div);
+}
+
+function atualizarTarefasProjeto(idProjeto) {
+    var nome = document.getElementById('proj-nome-' + idProjeto).value;
+    var box = document.getElementById('tap-box-' + idProjeto);
+    var containerAcoes = document.getElementById('acoes-container-' + idProjeto);
+    
+    if (!nome) { box.style.display = 'none'; containerAcoes.innerHTML = ''; return; }
+    box.style.display = 'block';
+    
+    var config = PROJETOS_CONFIG[nome];
+    if (config) {
+        containerAcoes.innerHTML = ''; 
+        adicionarAcaoOrcamentaria(idProjeto, true, config.ppa_loa, config.fonte, config.recurso_previsto); 
+    } else {
+        containerAcoes.innerHTML = '';
+        adicionarAcaoOrcamentaria(idProjeto, false, '', '', '');
+    }
+
+    toggleManualPct(idProjeto); 
+}
+
+function toggleManualPct(idProjeto) {
+    var isManual = document.getElementById('tap-manual-check-' + idProjeto).checked;
+    document.getElementById('tap-area-auto-' + idProjeto).style.display = isManual ? 'none' : 'block';
+    document.getElementById('tap-area-manual-' + idProjeto).style.display = isManual ? 'block' : 'none';
+    
+    if (!isManual) {
+        mudarFaseProjeto(idProjeto); 
+    } else {
+        atualizarBarraManual(idProjeto);
+    }
+}
+
+function atualizarBarraManual(idProjeto) {
+    var val = document.getElementById('tap-manual-val-' + idProjeto).value || 0;
+    val = Math.min(100, Math.max(0, parseInt(val)));
+    var fill = document.getElementById('tap-progress-manual-' + idProjeto);
+    fill.style.width = val + '%';
+    fill.textContent = val + '%';
+}
+
+function mudarFaseProjeto(idProjeto) {
+    var nome = document.getElementById('proj-nome-' + idProjeto).value;
+    var fase = document.getElementById('tap-fase-' + idProjeto).value;
+    var container = document.getElementById('tap-etapas-container-' + idProjeto);
+    
+    var cronograma = PROJETOS_CONFIG[nome] ? PROJETOS_CONFIG[nome].fases : (CRONOGRAMA_TAP[nome] || CRONOGRAMA_PADRAO);
+    var tarefas = cronograma[fase] || [];
+
+    var html = '<label>Etapas Concluídas nesta Fase</label>';
+    
+    if (fase === 'concluido') {
+        html += '<p style="color:#0B875B; font-weight:bold; font-size:0.9em;">✅ Projeto 100% Concluído e Entregue.</p>';
+        container.innerHTML = html;
+        recalcularProgresso(idProjeto);
+        return;
+    }
+
+    html += '<ul class="tap-etapas-list">';
+    for (var i = 0; i < tarefas.length; i++) {
+        html += '<li><input type="checkbox" id="tap-check-' + idProjeto + '-' + i + '" onchange="recalcularProgresso(' + idProjeto + ')"><label for="tap-check-' + idProjeto + '-' + i + '" style="margin-bottom:0; font-weight:normal; cursor:pointer;">' + escapeHtml(tarefas[i]) + '</label></li>';
+    }
+    html += '</ul>';
+    container.innerHTML = html;
+    
+    recalcularProgresso(idProjeto);
+}
+
+function recalcularProgresso(idProjeto) {
+    var fase = document.getElementById('tap-fase-' + idProjeto).value;
+    var pct = 0;
+
+    if (fase === 'concluido') {
+        pct = 100;
+    } else {
+        var checkboxes = document.querySelectorAll('#tap-etapas-container-' + idProjeto + ' input[type="checkbox"]');
+        var total = checkboxes.length;
+        var marcados = 0;
+        for (var i = 0; i < total; i++) { if (checkboxes[i].checked) marcados++; }
+
+        if (fase === 'inicial') pct = total === 0 ? 0 : (marcados / total) * 25;
+        else if (fase === 'intermediaria') pct = 25 + (total === 0 ? 0 : (marcados / total) * 50);
+        else if (fase === 'final') pct = 75 + (total === 0 ? 0 : (marcados / total) * 24);
+    }
+    
+    pct = Math.round(pct);
+    var fill = document.getElementById('tap-progress-' + idProjeto);
+    if(fill) {
+        fill.style.width = pct + '%';
+        fill.textContent = pct + '%';
+    }
+}
+
+function adicionarAcaoOrcamentaria(idProjeto, bloqueado, ppa, fonte, recursoPrev) {
+    contAcao++;
+    var idAcao = contAcao;
+    var container = document.getElementById('acoes-container-' + idProjeto);
+    if (!container) return;
+    var div = document.createElement('div');
+    div.className = 'acao-box'; div.id = 'acao-box-' + idAcao;
+
+    var datalistId = 'fontes-datalist-' + idAcao;
+    var opcoesFonte = '';
+    for (var i = 0; i < FONTES_RECURSO.length; i++) opcoesFonte += '<option value="' + escapeHtml(FONTES_RECURSO[i]) + '"></option>';
+
+    var htmlRemover = bloqueado ? '' : '<button type="button" class="btn-remove" onclick="removerItem(\'acao-box-' + idAcao + '\')">Remover</button>';
+    var readonlyAttr = bloqueado ? 'readonly' : '';
+    var bgReadonly = bloqueado ? 'background:#e9ecef; color:#666;' : '';
+
+    div.innerHTML = 
+        htmlRemover +
+        '<div class="acao-titulo">Ação Orçamentária ' + (bloqueado ? '(Definida pela SEPOG)' : '') + '</div>' +
+        '<div class="grid-2" style="margin-top:8px;">' +
+            '<div><label>PPA/LOA</label><input type="text" id="acao-ppa-' + idAcao + '" value="' + ppa + '" ' + readonlyAttr + ' style="' + bgReadonly + '"></div>' +
+            '<div><label>Fonte</label><input type="text" id="acao-fonte-' + idAcao + '" value="' + fonte + '" ' + readonlyAttr + ' list="' + datalistId + '" style="' + bgReadonly + '"><datalist id="' + datalistId + '">' + opcoesFonte + '</datalist></div>' +
+        '</div>' +
+        '<div class="grid-2" style="margin-top:8px;">' +
+            '<div><label>Recurso Previsto</label><input type="text" id="acao-prev-' + idAcao + '" value="' + recursoPrev + '" ' + readonlyAttr + ' style="' + bgReadonly + '"></div>' +
+            '<div><label>Recurso Executado</label><input type="text" id="acao-exec-' + idAcao + '"></div>' +
+        '</div>';
+    container.appendChild(div);
+}
+
+function removerItem(idBox) { var el = document.getElementById(idBox); if (el) el.parentNode.removeChild(el); }
+
+// =================================================================
+// MAPA (UNIDADE E ADMIN)
+// =================================================================
+function carregarMAPAUnidade(unidade) {
+    var bloco = document.getElementById('blocoMAPA');
+    var container = document.getElementById('mapa-container');
+    if (!bloco || !container) return;
+    container.innerHTML = '<em>Buscando...</em>';
+    bloco.style.display = 'block';
+
+    fetch(URL_GOOGLE + "?token=" + encodeURIComponent(TOKEN_ACESSO) + "&acao=carregar_mapa&unidade=" + unidade)
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            if(data.result === 'success') {
+                MAPA_CADASTRO_ADMIN = data.mapa_cadastro || [];
+                MAPA_RESPOSTAS_ANTERIORES = data.mapa_historico || [];
+                renderizarMAPAUnidade(unidade);
+            } else { container.innerHTML = '<em style="color:#a00;">Erro: ' + data.message + '</em>'; }
+        }).catch(function(){ container.innerHTML = '<em style="color:#a00;">Erro de conexão.</em>'; });
+}
+
+function renderizarMAPAUnidade(unidade) {
+    var problemasAtivos = MAPA_CADASTRO_ADMIN;
+    var container = document.getElementById('mapa-container');
+    if (problemasAtivos.length === 0) { container.innerHTML = '<em style="color:#0B875B; font-weight:bold;">✅ Nenhum problema pendente.</em>'; return; }
+    
+    var html = '';
+    problemasAtivos.forEach(function(prob) {
+        var anterior = MAPA_RESPOSTAS_ANTERIORES.find(function(r) { return r.id_mapa === prob.id; });
+        var statusSalvo = anterior ? anterior.status_unidade : 'Em execução';
+        var provSalva = anterior ? anterior.providencia : '';
+        var aviso = anterior ? '<div style="color:#005A9C; font-size:0.85em; margin-bottom:5px;">ℹ️ Resposta do período anterior recuperada.</div>' : '';
+
+        html += '<div class="mapa-box"><div class="mapa-num">ID: ' + prob.id + '</div><div class="mapa-problema"><strong>' + escapeHtml(prob.problema) + '</strong></div>' + aviso + '<div class="grid-2" style="margin-top:10px;"><div><label>Providência</label><textarea id="mapa-prov-' + prob.id + '">' + escapeHtml(provSalva) + '</textarea></div><div><label>Status</label><select id="mapa-status-' + prob.id + '"><option value="Parado"' + (statusSalvo === 'Parado' ? ' selected' : '') + '>Parado</option><option value="Em execução"' + (statusSalvo === 'Em execução' ? ' selected' : '') + '>Em execução</option><option value="Resolvido"' + (statusSalvo === 'Resolvido' ? ' selected' : '') + '>Resolvido</option></select></div></div></div>';
+    });
+    container.innerHTML = html;
+}
+
+function carregarAdminMAPA() {
+    var div = document.getElementById('listaMAPA');
+    div.innerHTML = '<em>Buscando...</em>';
+    fetch(URL_GOOGLE + "?token=" + encodeURIComponent(TOKEN_ACESSO) + "&acao=carregar_mapa_admin")
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            if(data.result === 'success') {
+                MAPA_CADASTRO_ADMIN = data.mapa_cadastro || [];
+                renderizarAdminMAPA(MAPA_CADASTRO_ADMIN, data.mapa_respostas || []);
+            } else { div.innerHTML = '<em style="color:#a00;">Erro: ' + data.message + '</em>'; }
+        }).catch(function(){ div.innerHTML = '<em style="color:#a00;">Erro de conexão.</em>'; });
+}
+
+function renderizarAdminMAPA(problemas, respostas) {
+    var div = document.getElementById('listaMAPA');
+    if (problemas.length === 0) { div.innerHTML = '<em>Nenhum problema ativo.</em>'; return; }
+    var html = '<table style="width:100%; border-collapse:collapse; font-size:0.85em;"><thead><tr style="background:#e0e0e0;"><th>ID</th><th>Unidade</th><th>Problema</th><th>Última Resposta</th><th>Status</th><th>Ação</th></tr></thead><tbody>';
+    problemas.forEach(function(p) {
+        var resp = respostas.find(function(r){ return r.id_mapa === p.id && r.unidade === p.unidade; });
+        var txtResp = resp ? '"' + escapeHtml(resp.providencia) + '"' : '<em>Nenhuma</em>';
+        var txtStatus = resp ? escapeHtml(resp.status_unidade) : '<em>-</em>';
+        html += '<tr><td style="border:1px solid #ccc; padding:6px;">' + p.id + '</td><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(p.unidade) + '</td><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(p.problema) + '</td><td style="border:1px solid #ccc; padding:6px;">' + txtResp + '</td><td style="border:1px solid #ccc; padding:6px; text-align:center;"><strong>' + txtStatus + '</strong></td><td style="border:1px solid #ccc; padding:6px; text-align:center;"><button type="button" class="btn-remove" style="float:none;" onclick="arquivarMAPA(\'' + p.id + '\')">Arquivar</button></td></tr>';
+    });
+    html += '</tbody></table>';
+    div.innerHTML = html;
+}
+
+function adicionarProblemaMAPA() {
+    var u = document.getElementById('mapaUnidade').value;
+    var p = document.getElementById('mapaProblema').value.trim();
+    var a = document.getElementById('mapaAcompanhamento').value.trim();
+    if (!u || !p) return alert("Preencha unidade e problema.");
+    var novoId = "M" + new Date().getTime().toString().slice(-4);
+    MAPA_CADASTRO_ADMIN.push({ id: novoId, unidade: u, problema: p, acompanhamento: a, ativo: true });
+    document.getElementById('mapaProblema').value = '';
+    document.getElementById('mapaAcompanhamento').value = '';
+    renderizarAdminMAPA(MAPA_CADASTRO_ADMIN, []);
+    alert("Adicionado localmente. Clique em 'Publicar Novos Problemas' para salvar.");
+}
+
+function arquivarMAPA(idProblema) {
+    if (!confirm("Tem certeza que deseja ARQUIVAR este problema?")) return;
+    var formData = new URLSearchParams();
+    formData.append('token', TOKEN_ACESSO);
+    formData.append('tipo', 'arquivar_mapa');
+    formData.append('id_mapa', idProblema);
+    fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.result === 'success') { alert("✅ Arquivado!"); carregarAdminMAPA(); } else { alert("Erro: " + data.message); }
+    }).catch(function(err){ alert("Erro: " + err.message); });
+}
+
+function publicarMAPACadastro() {
+    var status = document.getElementById('statusPublicacao');
+    status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Publicando...';
+    var formMapa = new URLSearchParams();
+    formMapa.append('token', TOKEN_ACESSO);
+    formMapa.append('tipo', 'publicar_mapa');
+    formMapa.append('lista_mapa', JSON.stringify(MAPA_CADASTRO_ADMIN.map(function(m) { return { id: m.id, unidade: m.unidade, problema: m.problema, acompanhamento: m.acompanhamento, ativo: true }; })));
+    fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formMapa.toString() })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.result === 'success') { status.className = 'status-sync status-ok'; status.textContent = '✅ Publicado!'; carregarAdminMAPA(); } else { throw new Error(data.message); }
+    }).catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
+}
+
+// =================================================================
+// GERAR RESUMO, CSV E CÓPIA
+// =================================================================
+function gerarResumo() {
+    var orgao = unidadeAtual();
+    if (!orgao) { alert('Selecione a unidade.'); return; }
+
+    var oficioParaUsar = OFICIOS_UNIDADES[orgao] || oficioBaseGlobal;
+
+    var tratamento = destinatarioGenero === "F" ? "a Senhora" : "o Senhor";
+    var saudacao = destinatarioGenero === "F" ? "Senhora Secretária" : "Senhor Secretário";
+    var enderecamento = '<div class="enderecamento"><p>À Sua Excelência, ' + tratamento + ',</p><p class="destinatario-nome">' + escapeHtml(destinatarioNome) + '</p><p class="destinatario-cargo">' + escapeHtml(destinatarioCargo) + '</p></div>';
+    var textoOficio = enderecamento + '<p class="recuo-tab"><strong>Assunto: Informações quadrimestrais dos indicadores de resultado do Planejamento Estratégico.</strong></p><p class="recuo-tab">' + saudacao + ',</p><p>Com cordiais cumprimentos, vimos por meio deste encaminhar as informações atualizadas referentes ao monitoramento do Plano Estratégico do Estado de Rondônia, relativas ao <strong>' + periodoReferencia + '</strong>, conforme solicitado no Ofício nº ' + escapeHtml(oficioParaUsar) + '.</p><p>As informações prestadas pela unidade <strong>' + orgao + '</strong> encontram-se detalhadas nas tabelas abaixo:</p>';
+
+    var tabelaResultados = '<thead><tr><th>Resultados</th><th>Indicador</th><th>Meta para 2027</th><th>Meta para 2026</th><th>Valor Alcançado</th><th>Informações Qualitativas</th></tr></thead><tbody>';
+    document.querySelectorAll('#resultados-container .item-box').forEach(function(box){
+        var id = box.id.replace('res-box-', '');
+        var res = document.getElementById('res-resultado-' + id).value;
+        var info = document.getElementById('res-info-' + id).value.trim();
+        if (!res) return;
+        var indBoxes = box.querySelectorAll('.indicador-box');
+        if (indBoxes.length === 0) {
+            tabelaResultados += '<tr><td>' + escapeHtml(res) + '</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td>' + (info ? escapeHtml(info) : '-') + '</td></tr>';
+        } else {
+            indBoxes.forEach(function(indBox, k){
+                var idInd = indBox.id.replace('ind-box-', '');
+                tabelaResultados += '<tr><td>' + (k === 0 ? escapeHtml(res) : '') + '</td><td>' + escapeHtml(document.getElementById('ind-nome-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-meta2027-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-meta2026-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-valor-' + idInd).value) + '</td><td>' + (k === 0 ? (info ? escapeHtml(info) : '-') : '') + '</td></tr>';
+            });
+        }
+    });
+    tabelaResultados += '</tbody>';
+
+    var tabelaProjetos = '<thead><tr><th>Projeto</th><th>Fase / %</th><th>PPA/LOA</th><th>Fonte</th><th>Rec. Previsto</th><th>Rec. Executado</th><th>Qualitativos</th></tr></thead><tbody>';
+    var temProjeto = false;
+    document.querySelectorAll('#projetos-container .item-box').forEach(function(box){
+        var idp = box.id.replace('proj-box-', '');
+        var proj = document.getElementById('proj-nome-' + idp).value;
+        if (!proj) return;
+        temProjeto = true;
+        
+        var isManual = document.getElementById('tap-manual-check-' + idp).checked;
+        var fasePct = isManual ? 'Manual (' + document.getElementById('tap-manual-val-' + idp).value + '%)' : document.getElementById('tap-fase-' + idp).options[document.getElementById('tap-fase-' + idp).selectedIndex].text + ' (' + document.getElementById('tap-progress-' + idp).textContent + ')';
+        
+        var dif = document.getElementById('proj-dificuldade-' + idp).value.trim();
+        var mel = document.getElementById('proj-melhoria-' + idp).value.trim();
+        var acoes = document.getElementById('proj-acoes-' + idp).value.trim();
+        var qual = 'Dif: ' + (dif || '-') + '<br>Mel: ' + (mel || '-') + '<br>Ações: ' + (acoes || '-');
+
+        var acaoBoxes = box.querySelectorAll('.acao-box');
+        if (acaoBoxes.length === 0) {
+            tabelaProjetos += '<tr><td>' + escapeHtml(proj) + '</td><td class="center">' + fasePct + '</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td>' + qual + '</td></tr>';
+        } else {
+            acaoBoxes.forEach(function(acaoBox, a){
+                var idA = acaoBox.id.replace('acao-box-', '');
+                tabelaProjetos += '<tr><td>' + (a === 0 ? escapeHtml(proj) : '') + '</td><td class="center">' + (a === 0 ? fasePct : '') + '</td><td>' + escapeHtml(document.getElementById('acao-ppa-' + idA).value) + '</td><td>' + escapeHtml(document.getElementById('acao-fonte-' + idA).value) + '</td><td class="center">' + escapeHtml(document.getElementById('acao-prev-' + idA).value) + '</td><td class="center">' + escapeHtml(document.getElementById('acao-exec-' + idA).value) + '</td><td>' + (a === 0 ? qual : '') + '</td></tr>';
+            });
+        }
+    });
+    tabelaProjetos += '</tbody>';
+
+    var tabelaMAPA = '<thead><tr><th>ID</th><th>Problema</th><th>Providência</th><th>Status</th></tr></thead><tbody>';
+    var temMAPA = false;
+    MAPA_CADASTRO_ADMIN.filter(function(p){ return p.unidade === orgao; }).forEach(function(p){
+        temMAPA = true;
+        var prov = document.getElementById('mapa-prov-' + p.id) ? document.getElementById('mapa-prov-' + p.id).value : '';
+        var stat = document.getElementById('mapa-status-' + p.id) ? document.getElementById('mapa-status-' + p.id).value : '';
+        tabelaMAPA += '<tr><td class="center">' + p.id + '</td><td>' + escapeHtml(p.problema) + '</td><td>' + (prov ? escapeHtml(prov) : '-') + '</td><td class="center">' + escapeHtml(stat) + '</td></tr>';
+    });
+    tabelaMAPA += '</tbody>';
+
+    var fechamento = '<br><br><p>Respeitosamente,</p><br><br><p style="text-align:center; margin:0;">XXXXXXXXXXXXXXXXXXXXXXXXX</p><p style="text-align:center; margin:0;">XXXXXXXXXXXXXXXXXXXXXXXX- ' + orgao + '</p>';
+
+    document.getElementById('texto-oficio').innerHTML = textoOficio;
+    document.getElementById('tabela-resultados').innerHTML = tabelaResultados;
+    document.getElementById('tabela-projetos').innerHTML = tabelaProjetos;
+
+    document.getElementById('tituloTabela2').style.display = temProjeto ? 'block' : 'none';
+    document.getElementById('tabela-projetos').parentNode.style.display = temProjeto ? 'block' : 'none';
+
+    document.getElementById('tituloTabelaMAPA').style.display = temMAPA ? 'block' : 'none';
+    document.getElementById('tabela-mapa').style.display = temMAPA ? 'table' : 'none';
+    if(temMAPA) document.getElementById('tabela-mapa').innerHTML = tabelaMAPA;
+
+    var fechExist = document.getElementById('fechamento-oficio');
+    if (fechExist) fechExist.parentNode.removeChild(fechExist);
+    var divFech = document.createElement('div');
+    divFech.id = 'fechamento-oficio';
+    divFech.style.marginTop = '40px';
+    divFech.style.fontFamily = "'Times New Roman', serif";
+    divFech.style.fontSize = '1.05em';
+    divFech.innerHTML = fechamento;
+    document.getElementById('tabela-projetos').parentNode.parentNode.appendChild(divFech);
+
+    document.getElementById('resultado-area').style.display = 'block';
+    document.getElementById('resultado-area').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copiarTexto() {
+    var elTexto = document.getElementById('texto-oficio');
+    var elFechamento = document.getElementById('fechamento-oficio');
+    if (!elTexto) return alert('Gere o resumo primeiro.');
+
+    var range = document.createRange();
+    range.setStartBefore(elTexto); 
+    if (elFechamento) range.setEndAfter(elFechamento);
+    else range.setEndAfter(document.getElementById('tabela-mapa') ? document.getElementById('tabela-mapa').parentNode : elTexto);
+
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    try {
+        var sucesso = document.execCommand('copy');
+        if (sucesso) alert('✅ Ofício e tabelas copiados com a formatação original!');
+        else throw new Error('Falha');
+    } catch (err) {
+        alert('⚠️ Use Ctrl+C manualmente.');
+    }
+    sel.removeAllRanges();
+}
+
+function baixarExcel() {
+    var orgao = unidadeAtual();
+    var responsavel = document.getElementById('responsavel').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var headers = ['Período','Órgão','Responsável','E-mail','Tipo','Resultado','Indicador','Meta 2027','Meta 2026','Valor Alcançado','Projeto','Fase','% Execução','Manual?','PPA/LOA','Fonte','Rec. Previsto','Rec. Executado','MAPA_ID','MAPA_Problema','MAPA_Providência','MAPA_Status','Qualitativos'];
+    var csv = headers.join(';') + '\n';
+
+    document.querySelectorAll('#resultados-container .item-box').forEach(function(box){
+        var id = box.id.replace('res-box-', '');
+        var res = document.getElementById('res-resultado-' + id).value;
+        if (!res) return;
+        var info = document.getElementById('res-info-' + id).value.replace(/(\r\n|\n|\r)/gm, ' ');
+        var inds = box.querySelectorAll('.indicador-box');
+        if (inds.length === 0) {
+            csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, '','','','','','','','','','','','','','','','', info].join(';') + '\n';
+        } else {
+            inds.forEach(function(indBox){
+                var idInd = indBox.id.replace('ind-box-', '');
+                csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, document.getElementById('ind-nome-' + idInd).value, document.getElementById('ind-meta2027-' + idInd).value, document.getElementById('ind-meta2026-' + idInd).value, document.getElementById('ind-valor-' + idInd).value, '','','','','','','','','','','','', info].join(';') + '\n';
+            });
+        }
+    });
+
+    document.querySelectorAll('#projetos-container .item-box').forEach(function(box){
+        var idp = box.id.replace('proj-box-', '');
+        var proj = document.getElementById('proj-nome-' + idp).value;
+        if (!proj) return;
+        var isManual = document.getElementById('tap-manual-check-' + idp).checked;
+        var pct = isManual ? document.getElementById('tap-manual-val-' + idp).value + '%' : document.getElementById('tap-progress-' + idp).textContent;
+        var fase = document.getElementById('tap-fase-' + idp).value;
+        var dif = document.getElementById('proj-dificuldade-' + idp).value.replace(/(\r\n|\n|\r)/gm, ' ');
+        var mel = document.getElementById('proj-melhoria-' + idp).value.replace(/(\r\n|\n|\r)/gm, ' ');
+        var acoes = document.getElementById('proj-acoes-' + idp).value.replace(/(\r\n|\n|\r)/gm, ' ');
+        var qual = 'Dif: ' + (dif || '-') + ' | Mel: ' + (mel || '-') + ' | Ações: ' + (acoes || '-');
+
+        var acaoBoxes = box.querySelectorAll('.acao-box');
+        if (acaoBoxes.length === 0) {
+            csv += [periodoReferencia, orgao, responsavel, email, 'Projeto','','','','','', proj, fase, pct, isManual ? 'Sim' : 'Não', '','','','','','','','', qual].join(';') + '\n';
+        } else {
+            acaoBoxes.forEach(function(acaoBox){
+                var idA = acaoBox.id.replace('acao-box-', '');
+                csv += [periodoReferencia, orgao, responsavel, email, 'Projeto','','','','','', proj, fase, pct, isManual ? 'Sim' : 'Não', document.getElementById('acao-ppa-' + idA).value, document.getElementById('acao-fonte-' + idA).value, document.getElementById('acao-prev-' + idA).value, document.getElementById('acao-exec-' + idA).value, '','','','', qual].join(';') + '\n';
+            });
+        }
+    });
+
+    MAPA_CADASTRO_ADMIN.filter(function(p){ return p.unidade === orgao; }).forEach(function(p){
+        var prov = document.getElementById('mapa-prov-' + p.id) ? document.getElementById('mapa-prov-' + p.id).value.replace(/(\r\n|\n|\r)/gm, ' ') : '';
+        var stat = document.getElementById('mapa-status-' + p.id) ? document.getElementById('mapa-status-' + p.id).value : '';
+        csv += [periodoReferencia, orgao, responsavel, email, 'MAPA','','','','','','','','','','','','','', p.id, p.problema, prov, stat, ''].join(';') + '\n';
+    });
+
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'monitoramento_' + (orgao || 'unidade') + '_' + periodoReferencia.replace(/[^a-zA-Z0-9]/g, '_') + '.csv';
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+
+function enviarParaGoogle() {
+    var orgao = unidadeAtual();
+    if (!orgao) return alert('Selecione a Unidade.');
+    var responsavel = document.getElementById('responsavel').value.trim();
+    var email = document.getElementById('email').value.trim();
+    if (!responsavel || !email) return alert('Preencha Responsável e E-mail.');
+
+    var dados = { orgao: orgao, responsavel: responsavel, email: email, periodo: periodoReferencia, resultados: [], projetos: [], mapa: [] };
+    
+    document.querySelectorAll('#resultados-container .item-box').forEach(function(box){
+        var id = box.id.replace('res-box-','');
+        var res = document.getElementById('res-resultado-'+id).value;
+        if(!res) return;
+        var inds = [];
+        box.querySelectorAll('.indicador-box').forEach(function(indBox){
+            var idInd = indBox.id.replace('ind-box-','');
+            inds.push({ nome: document.getElementById('ind-nome-'+idInd).value, meta2027: document.getElementById('ind-meta2027-'+idInd).value, meta2026: document.getElementById('ind-meta2026-'+idInd).value, valor: document.getElementById('ind-valor-'+idInd).value });
+        });
+        dados.resultados.push({ resultado: res, indicadores: inds, infoQual: document.getElementById('res-info-'+id).value });
+    });
+
+    document.querySelectorAll('#projetos-container .item-box').forEach(function(box){
+        var id = box.id.replace('proj-box-','');
+        var proj = document.getElementById('proj-nome-'+id).value;
+        if(!proj) return;
+        
+        var isManual = document.getElementById('tap-manual-check-'+id).checked;
+        var pct = isManual ? document.getElementById('tap-manual-val-'+id).value + '%' : document.getElementById('tap-progress-'+id).textContent;
+        
+        var acoes = [];
+        box.querySelectorAll('.acao-box').forEach(function(acaoBox){
+            var idAcao = acaoBox.id.replace('acao-box-','');
+            acoes.push({ ppa: document.getElementById('acao-ppa-'+idAcao).value, fonte: document.getElementById('acao-fonte-'+idAcao).value, recursoPrev: document.getElementById('acao-prev-'+idAcao).value, recursoExec: document.getElementById('acao-exec-'+idAcao).value });
+        });
+
+        dados.projetos.push({
+            nome: proj,
+            fase: document.getElementById('tap-fase-'+id).value,
+            tarefaAtual: isManual ? document.getElementById('tap-atual-'+id).value : '',
+            proximaTarefa: isManual ? document.getElementById('tap-proxima-'+id).value : '',
+            progresso: pct,
+            manual: isManual ? "Sim" : "Não",
+            dificuldade: document.getElementById('proj-dificuldade-'+id).value,
+            melhoria: document.getElementById('proj-melhoria-'+id).value,
+            acoesNecessarias: document.getElementById('proj-acoes-'+id).value,
+            acoes: acoes
+        });
+    });
+
+    MAPA_CADASTRO_ADMIN.filter(function(p){ return p.unidade === orgao; }).forEach(function(p){
+        if(document.getElementById('mapa-prov-' + p.id)) {
+            dados.mapa.push({ id_mapa: p.id, problema: p.problema, providencia: document.getElementById('mapa-prov-' + p.id).value.trim(), status_unidade: document.getElementById('mapa-status-' + p.id).value });
+        }
+    });
+
+    var formData = new URLSearchParams();
+    formData.append('token', TOKEN_ACESSO);
+    formData.append('tipo', 'submissao');
+    formData.append('dados_json', JSON.stringify(dados));
+
+    var status = document.getElementById('statusCarregamento');
+    status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Enviando...';
+
+    fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.result === 'success') { alert("✅ Enviado! ID: " + data.id_submissao); status.className = 'status-sync status-ok'; status.textContent = '✅ Enviado.'; }
+        else { alert("Erro: " + data.message); }
+    }).catch(function(err){ alert("Erro: " + err.message); });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (new URLSearchParams(window.location.search).get('admin') === '1') MODO_ADMIN_ATIVO = true;
+    
+    var sel = document.getElementById('orgao');
+    UNIDADES.forEach(function(u){ var o = document.createElement('option'); o.value = u; o.textContent = u; sel.appendChild(o); });
+    
+    var dl = document.getElementById('fontes-list');
+    FONTES_RECURSO.forEach(function(f){ var o = document.createElement('option'); o.value = f; dl.appendChild(o); });
+    
+    if (MODO_ADMIN_ATIVO) { var btn = document.getElementById('btnAdmin'); if (btn) btn.style.display = 'block'; }
+    
+    carregarDados();
+});
+</script>
+</body>
+</html>
