@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>Monitoramento PE 2026 - Formulário Guiado</title>
+<title>Monitoramento PE 2026 - Formulário Guiado (v1-7)</title>
 <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
     .container { max-width: 1200px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     h1 { color: #003366; border-bottom: 3px solid #003366; padding-bottom: 10px; margin-top: 0; margin-bottom: 5px; }
+    .badge-versao { display: inline-block; background: #005A9C; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 0.5em; vertical-align: middle; margin-left: 10px; }
     .versao-titulo { font-size: 0.85em; color: #6c757d; margin-bottom: 20px; font-style: italic; }
     .header-info { display: flex; justify-content: space-between; align-items: center; background: #eef4fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
     .bloco { background: #fdfdfd; border: 1px solid #dce4ec; border-radius: 6px; padding: 20px; margin-bottom: 20px; }
@@ -24,8 +24,10 @@
     .btn-primary { background: #005A9C; color: white; }
     .btn-success { background: #0B875B; color: white; }
     .btn-warning { background: #e67e22; color: white; }
+    .btn-danger { background: #dc3545; color: white; }
     .btn-add { background: #6c757d; color: white; padding: 8px 15px; font-size: 0.9em; margin-top: 10px; }
     .btn-add-acao { background: #6f42c1; color: white; padding: 6px 12px; font-size: 0.85em; margin-top: 8px; }
+    .btn-add-fonte { background: #17a2b8; color: white; padding: 6px 12px; font-size: 0.85em; margin-top: 8px; }
     .btn-remove { background: #dc3545; color: white; padding: 5px 10px; font-size: 0.8em; float: right; }
     .btn-aba { background: #dce4ec; color: #003366; padding: 10px 20px; font-size: 0.95em; border-radius: 5px 5px 0 0; margin-right: 5px; }
     .btn-aba.ativa { background: #005A9C; color: white; }
@@ -33,6 +35,7 @@
     .item-box h3 { margin-top: 0; font-size: 1em; color: #005A9C; }
     .indicador-box { border: 1px dashed #17a2b8; padding: 12px; margin-top: 10px; border-radius: 4px; background: #f0f8fa; }
     .acao-box { border: 1px dashed #6f42c1; padding: 12px; margin-top: 10px; border-radius: 4px; background: #f6f2fc; }
+    .fonte-box { border: 1px dashed #17a2b8; padding: 10px; margin-top: 8px; border-radius: 4px; background: #e6f7f9; }
     .info-qual-box { margin-top: 12px; padding-top: 10px; border-top: 1px dashed #ccc; }
     .mapa-box { border: 1px solid #c77; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #fdf6f6; }
     .mapa-num { font-weight: bold; color: #a00; font-size: 0.9em; }
@@ -80,8 +83,8 @@
 <body>
 
 <div class="container">
-    <h1>Monitoramento do Plano Estratégico</h1>
-    <div class="versao-titulo">Versão: v1-4 (Ajustes de Indicadores e Pré-carga de Metas)</div>
+    <h1>Monitoramento do Plano Estratégico <span class="badge-versao">v1-7</span></h1>
+    <div class="versao-titulo">Versão: v1-7 (Fontes Editáveis + Ofício de Resposta na Validação + Indicadores Textuais)</div>
 
     <div class="periodo-banner">
         <div>
@@ -93,15 +96,16 @@
 
     <div id="statusCarregamento" class="status-sync status-info" style="display:none;"></div>
 
-    <!-- PAINEL ADMIN (GAMPP) -->
+    <!-- PAINEL ADMIN -->
     <div id="adminPanel">
         <h3 style="margin-top:0;color:#856404;">🔧 Painel de Administração - GAMPP/SEPOG</h3>
         
         <div class="abas">
             <button class="btn-aba ativa" id="abaBtnMonitoramento" onclick="trocarAba('monitoramento')">Parâmetros Gerais</button>
             <button class="btn-aba" id="abaBtnMapa" onclick="trocarAba('mapa')">Gerenciar MAPA</button>
-            <button class="btn-aba" id="abaBtnProjetos" onclick="trocarAba('projetos')">Configurar Projetos (TAP e Orçamento)</button>
+            <button class="btn-aba" id="abaBtnProjetos" onclick="trocarAba('projetos')">Configurar Projetos</button>
             <button class="btn-aba" id="abaBtnOficios" onclick="trocarAba('oficios')">Ofícios por Unidade</button>
+            <button class="btn-aba" id="abaBtnMonitoramentos" onclick="trocarAba('monitoramentos')">Monitoramentos Anteriores</button>
         </div>
 
         <div id="abaMonitoramento" class="aba-conteudo ativa">
@@ -137,31 +141,23 @@
 
         <div id="abaProjetos" class="aba-conteudo">
             <div class="aviso-admin">
-                Defina aqui as regras de cada projeto. A <strong>Fonte</strong>, o <strong>PPA/LOA</strong>, o <strong>Recurso Previsto</strong> e as <strong>Tarefas Padrão</strong> serão carregados automaticamente e bloqueados para a unidade.
+                Defina as regras de cada projeto. <strong>Múltiplas fontes por ação são permitidas. O campo de Fonte é editável.</strong>
             </div>
             <div class="grid-2">
                 <div><label>Selecione o Projeto</label><select id="configProjSelect" onchange="carregarConfigProjeto()"></select></div>
                 <div><label>Vinculação ao PPA e LOA</label><input type="text" id="configProjPPA" placeholder="Ex.: 17.012.10.122.2070.1614"></div>
             </div>
-            <div class="grid-3" style="margin-top:10px;">
-                <div><label>Fonte de Recurso</label><input type="text" id="configProjFonte" list="fontes-list" placeholder="Selecione ou digite..."></div>
-                <div><label>Recurso Previsto (Valor)</label><input type="text" id="configProjRecursoPrev" placeholder="Ex.: 3.000.000,00"></div>
-                <div></div>
+            
+            <div id="configFontesContainer" style="margin-top:15px;">
+                <label>Fontes de Recurso (Múltiplas)</label>
+                <div id="configFontesList"></div>
+                <button class="btn-add-fonte" onclick="adicionarFonteConfig()">+ Adicionar Fonte</button>
             </div>
             
             <div class="grid-3" style="margin-top:15px;">
-                <div>
-                    <label>Tarefas da Fase Inicial (Uma por linha)</label>
-                    <textarea id="configTarefasInicial" rows="5" placeholder="Estudo preliminar&#10;Projeto básico"></textarea>
-                </div>
-                <div>
-                    <label>Tarefas da Fase Intermediária (Uma por linha)</label>
-                    <textarea id="configTarefasInter" rows="5" placeholder="Licitação&#10;Execução de obra"></textarea>
-                </div>
-                <div>
-                    <label>Tarefas da Fase Final (Uma por linha)</label>
-                    <textarea id="configTarefasFinal" rows="5" placeholder="Vistoria&#10;Recebimento provisório"></textarea>
-                </div>
+                <div><label>Tarefas da Fase Inicial (Uma por linha)</label><textarea id="configTarefasInicial" rows="5"></textarea></div>
+                <div><label>Tarefas da Fase Intermediária (Uma por linha)</label><textarea id="configTarefasInter" rows="5"></textarea></div>
+                <div><label>Tarefas da Fase Final (Uma por linha)</label><textarea id="configTarefasFinal" rows="5"></textarea></div>
             </div>
             <div class="admin-actions" style="margin-top:15px;">
                 <button class="btn-primary" onclick="salvarProjetoConfig()">💾 Salvar Configuração do Projeto</button>
@@ -171,11 +167,11 @@
 
         <div id="abaOficios" class="aba-conteudo">
             <div class="aviso-admin">
-                Cadastre o número do ofício que foi enviado para cada unidade. Quando o servidor da unidade for gerar o resumo, esse número aparecerá automaticamente no texto do Ofício.
+                Cadastre o <strong>Ofício de Envio</strong> (que a GAMPP enviou à unidade). O Ofício de Resposta é preenchido na aba "Monitoramentos Anteriores" no momento da validação.
             </div>
             <div class="grid-2">
                 <div><label>Unidade</label><select id="oficioUnidade"></select></div>
-                <div><label>Número do Ofício Enviado</label><input type="text" id="oficioNumero" placeholder="Ex.: 9327/2026/SEDAM-GAB"></div>
+                <div><label>Ofício de Envio</label><input type="text" id="oficioNumeroEnvio" placeholder="Ex.: 9327/2026/SEDAM-GAB"></div>
             </div>
             <button class="btn-add" onclick="adicionarOficioUnidade()">+ Vincular Ofício à Unidade</button>
             
@@ -189,6 +185,24 @@
             <div id="statusOficios" class="status-sync" style="display:none;"></div>
         </div>
 
+        <div id="abaMonitoramentos" class="aba-conteudo">
+            <div class="aviso-admin">
+                Digite o <strong>Ofício de Resposta</strong> e clique em <strong>"Validar"</strong> para finalizar o período.
+            </div>
+            <div class="grid-2">
+                <div>
+                    <label>Filtrar por Unidade</label>
+                    <select id="filtroMonUnidade" onchange="carregarMonitoramentosAnteriores()">
+                        <option value="">Todas as Unidades</option>
+                    </select>
+                </div>
+                <div></div>
+            </div>
+            <div id="listaMonitoramentos" style="background:#fff; padding:15px; border-radius:5px; border:1px solid #ddd; overflow-x:auto; margin-top:15px;">
+                <em style="color:#888;">Selecione uma unidade para ver os monitoramentos.</em>
+            </div>
+        </div>
+
         <div class="admin-actions" style="margin-top:20px; border-top:1px solid #ddd; padding-top:15px;">
             <button class="btn-add" style="background:#6c757d;" onclick="fecharAdmin()">✖ Fechar Painel Admin</button>
         </div>
@@ -199,7 +213,6 @@
         <p style="font-size: 0.9em; color: #555;" id="infoOficio">Carregando...</p>
     </div>
 
-    <!-- BLOCO 1: IDENTIFICAÇÃO -->
     <div class="bloco">
         <span class="bloco-titulo">1. Identificação da Unidade</span>
         <div class="grid-3">
@@ -218,9 +231,12 @@
                 <input type="email" id="email" placeholder="email@ro.gov.br" required>
             </div>
         </div>
+        <div style="margin-top:10px;">
+            <label for="oficioEnvio">Ofício de Envio (da GAMPP)</label>
+            <input type="text" id="oficioEnvio" readonly placeholder="Preenchido automaticamente">
+        </div>
     </div>
 
-    <!-- BLOCO 2: RESULTADOS -->
     <div class="bloco">
         <span class="bloco-titulo">2. Resultados e Metas</span>
         <div class="aviso-unidade" id="avisoResultadosUnidade">ℹ️ Selecione a unidade no Bloco 1 para ver os resultados.</div>
@@ -228,7 +244,6 @@
         <button type="button" class="btn-add" onclick="adicionarResultado()">+ Adicionar Resultado</button>
     </div>
 
-    <!-- BLOCO 3: PROJETOS -->
     <div class="bloco">
         <span class="bloco-titulo">3. Projetos e Execução</span>
         <div class="aviso-unidade" id="avisoProjetosUnidade">ℹ️ Selecione a unidade no Bloco 1 para ver os projetos.</div>
@@ -236,13 +251,13 @@
         <button type="button" class="btn-add" onclick="adicionarProjeto()">+ Adicionar Projeto</button>
     </div>
 
-    <!-- BLOCO 4: MAPA -->
     <div class="bloco" id="blocoMAPA" style="display:none; border-left: 4px solid #a00;">
         <span class="bloco-titulo" style="border-left-color: #a00; color:#a00;">4. MAPA — Matriz de Acompanhamento de Problemas e Ameaças</span>
         <div id="mapa-container"></div>
     </div>
 
     <div class="btn-group">
+        <button class="btn-danger" onclick="limparDados()">🗑️ Limpar Dados Inseridos</button>
         <button class="btn-primary" onclick="gerarResumo()">Gerar Resumo para Ofício</button>
         <button class="btn-success" onclick="baixarExcel()">Baixar Planilha (CSV)</button>
         <button class="btn-warning" onclick="enviarParaGoogle()">📤 Enviar para a SEPOG</button>
@@ -268,10 +283,10 @@
 
 <script>
 // =================================================================
-// CONFIGURAÇÕES E ESTADO GLOBAL
+// CONFIGURAÇÕES (v1-7)
 // =================================================================
 var SENHA_ADMIN = "gampp2026";
-var URL_GOOGLE = "https://script.google.com/macros/s/AKfycbw4NxHtUTQ9AyWN97RQxCHE7PK0cyBID_aS45rgwcBZRB5_DFzuUU2TwfO9UKTw3Q/exec";
+var URL_GOOGLE = "https://script.google.com/macros/s/AKfycbxYEXyp-QEgzYmiwQ7FdR8M7mpVJ_2rRGUL_J1Aign-mykclYcxxuojzLi7TAIHsA/exec";
 var TOKEN_ACESSO = "PE-RO-2026-A7F3B9E2C4D8F1A5B6E7C8D9A0B1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8B9";
 
 var periodoReferencia = "2º Quadrimestre 2026";
@@ -281,12 +296,8 @@ var destinatarioCargo = "Secretária de Estado de Planejamento, Orçamento e Ges
 var destinatarioGenero = "F";
 var MODO_ADMIN_ATIVO = false;
 
-var MAPA_CADASTRO_ADMIN = []; 
-var MAPA_RESPOSTAS_ANTERIORES = []; 
-var PROJETOS_CONFIG = {}; 
-var OFICIOS_UNIDADES = {}; 
-
-var contResultado = 0, contProjeto = 0, contIndicador = 0, contAcao = 0;
+var MAPA_CADASTRO_ADMIN = [], MAPA_RESPOSTAS_ANTERIORES = [], PROJETOS_CONFIG = {}, OFICIOS_UNIDADES = {};
+var contResultado = 0, contProjeto = 0, contIndicador = 0, contAcao = 0, contFonteConfig = 0;
 
 var UNIDADES = ["SEAGRI","SEDEC","DER","SEOSP","SEAS","IDEP","SEDUC","SEFIN","SETIC","SEDAM","SEPAT","SESAU","SESDEC","SEJUS","PC","POLITEC","SETUR"];
 
@@ -301,35 +312,62 @@ var CRONOGRAMA_TAP = {
 var CRONOGRAMA_PADRAO = { inicial: ["Planejamento e Estudos", "Projeto Básico", "Processo Licitatório"], intermediaria: ["Contrato Assinado", "Execução Física", "Fiscalização"], final: ["Conclusão da Obra", "Vistoria Provisória"], concluido: ["Recebimento Definitivo", "Prestação de Contas"] };
 
 var RESULTADOS = [
-    { nome: "Viabilizar o acesso a novas tecnologias para agricultores familiares", unidades: ["SEAGRI"], indicadores: ["8.962 propriedades de agricultores familiares com acesso a novas tecnologias"] },
-    { nome: "Melhoria da logística de abastecimento de alimentos", unidades: ["SEAGRI"], indicadores: ["2.015 produtores e comerciantes atendidos"] },
-    { nome: "Ampliação das indústrias do estado de Rondônia", unidades: ["SEDEC"], indicadores: ["23.374 indústrias instaladas"] },
-    { nome: "Expansão em US$ FOB do valor de produtos exportados", unidades: ["SEDEC"], indicadores: ["US$ FOB 4.432.820.838,00"] },
-    { nome: "35% da malha rodoviária do Estado pavimentada", unidades: ["DER"], indicadores: ["107,51 km pavimentados"] },
-    { nome: "100% da malha rodoviária do estado conservada", unidades: ["DER"], indicadores: ["100% de km conservado (pavimentados e não pavimentados)"] },
-    { nome: "Viabilizar a inclusão de municípios do Estado no mapa do turismo brasileiro", unidades: ["SETUR"], indicadores: ["32 municípios do Estado no mapa turístico", "126 empresas cadastradas", "159.000 visitações"] },
-    { nome: "Famílias com acesso ou melhoria à habitação social", unidades: ["SEAS"], indicadores: ["10 mil unidades habitacionais entregues"] },
-    { nome: "Refeições nutricionalmente adequadas...", unidades: ["SEAS"], indicadores: ["10 milhões de refeições fornecidas"] },
-    { nome: "Pessoas em vulnerabilidade social capacitadas...", unidades: ["SEAS"], indicadores: ["40 mil pessoas qualificadas integralmente"] },
-    { nome: "Oferta de cursos profissionalizantes...", unidades: ["IDEP"], indicadores: ["70.500 matrículas nos cursos técnicos de nível médio, qualificação profissional e formação inicial"] },
-    { nome: "Ofertar qualificação profissional para o sistema prisional", unidades: ["IDEP"], indicadores: ["1.500 matrículas nos cursos de qualificação profissional e formação inicial"] },
-    { nome: "Elevação do Desempenho de Proficiência...", unidades: ["SEDUC"], indicadores: ["40% de proficiência em Língua Portuguesa no Ensino Fundamental", "20% de proficiência em Matemática no Ensino Fundamental", "30% de proficiência em Língua Portuguesa no Ensino Médio", "15% de proficiência em Matemática no Ensino Médio"] },
-    { nome: "Aumento da arrecadação de impostos", unidades: ["SEFIN"], indicadores: ["R$ 10.108.465.678,00 de arrecadação"] },
-    { nome: "Crescimento dos recursos de hardware...", unidades: ["SETIC"], indicadores: ["150% no índice de capacidade de armazenamento"] },
-    { nome: "Fornecer o link de INFOVIA...", unidades: ["SETIC"], indicadores: ["9 cidades atendidas com a INFOVIA"] },
-    { nome: "Melhoria da qualidade dos serviços digitais...", unidades: ["SETIC"], indicadores: ["Índice 135 em maturidade ABEP-TIC"] },
-    { nome: "Encerramento dos lixões e ações de resíduos sólidos", unidades: ["SEDAM"], indicadores: ["26 lixões encerrados", "26 vistorias realizadas em lixões encerrados", "125 servidores da SEDAM e dos municípios capacitados", "52 diagnósticos de áreas de lixões"] },
-    { nome: "Áreas rurais regularizadas", unidades: ["SEPAT"], indicadores: ["100 mil hectares rurais georreferenciados", "3 mil vistorias em lotes", "12 mil pendências em lotes reduzidas", "100 núcleos urbanos e secundários destinados", "12 mil documentos titulatórios emitidos", "08 convênios/termos formalizados"] },
-    { nome: "Núcleos urbanos regularizados", unidades: ["SEPAT"], indicadores: ["4.150 lotes regularizados", "2.550 imóveis titulados"] },
-    { nome: "Unidades de Saúde em pleno funcionamento (HEURO/CEPEM)", unidades: ["SESAU"], indicadores: ["100% das Unidades de Saúde em pleno funcionamento"] },
-    { nome: "Unidades de Saúde em pleno funcionamento (HICD/CEMETRON...)", unidades: ["SESAU"], indicadores: ["100% das Unidades de Saúde em pleno funcionamento"] },
-    { nome: "Redução de homicídios dolosos", unidades: ["SESDEC"], indicadores: ["Taxa de 21,7 homicídios por 100 mil habitantes"] },
-    { nome: "Redução de roubos", unidades: ["SESDEC"], indicadores: ["Taxa de 834,8 roubos consumados por 100 mil habitantes"] },
-    { nome: "Redução de lesões corporais - violência doméstica", unidades: ["SESDEC"], indicadores: ["Taxa de 242,3 lesões corporais por 100 mil habitantes"] },
-    { nome: "Redução da violência no campo", unidades: ["SESDEC"], indicadores: ["Taxa de 40,3 crimes de violência no campo"] },
-    { nome: "Edificações da Segurança Pública", unidades: ["SESDEC"], indicadores: ["100% da quantidade de ampliação, adequação e modernização de edificações"] },
-    { nome: "Central de Monitoração Eletrônica...", unidades: ["SEJUS"], indicadores: ["75% de pessoas monitoradas com tornozeleiras eletrônicas"] },
-    { nome: "Complexo de Perícias Criminais", unidades: ["POLITEC"], indicadores: ["IPA=1 no índice de produtividade anual", "100% dos laboratórios instalados"] }
+    { nome: "Viabilizar o acesso a novas tecnologias para agricultores familiares", unidades: ["SEAGRI"], indicadores: [{ nome: "propriedades de agricultores familiares com acesso a novas tecnologias", meta2027: "8.962 propriedades de agricultores familiares com acesso a novas tecnologias até 2027" }] },
+    { nome: "Melhoria da logística de abastecimento de alimentos", unidades: ["SEAGRI"], indicadores: [{ nome: "produtores e comerciantes atendidos", meta2027: "2.015 produtores e comerciantes atendidos até 2027" }] },
+    { nome: "Ampliação das indústrias do estado de Rondônia", unidades: ["SEDEC"], indicadores: [{ nome: "indústrias instaladas", meta2027: "23.374 indústrias instaladas até 2027" }] },
+    { nome: "Expansão em US$ FOB do valor de produtos exportados", unidades: ["SEDEC"], indicadores: [{ nome: "valor de produtos exportados US$ FOB", meta2027: "US$ FOB 4.432.820.838,00 até 2027" }] },
+    { nome: "35% da malha rodoviária do Estado pavimentada", unidades: ["DER"], indicadores: [{ nome: "km pavimentados", meta2027: "107,51 km pavimentados até 2027" }] },
+    { nome: "100% da malha rodoviária do estado conservada", unidades: ["DER"], indicadores: [{ nome: "km conservado (pavimentados e não pavimentados)", meta2027: "100% de km conservado (pavimentados e não pavimentados) até 2027" }] },
+    { nome: "Viabilizar a inclusão de municípios do Estado no mapa do turismo brasileiro", unidades: ["SETUR"], indicadores: [
+        { nome: "municípios do Estado no mapa turístico", meta2027: "32 municípios do Estado no mapa turístico até 2027" },
+        { nome: "empresas cadastradas", meta2027: "126 empresas cadastradas até 2027" },
+        { nome: "visitações", meta2027: "159.000 visitações até 2027" }
+    ] },
+    { nome: "Famílias com acesso ou melhoria à habitação social", unidades: ["SEAS"], indicadores: [{ nome: "unidades habitacionais entregues", meta2027: "10 mil unidades habitacionais entregues até 2027" }] },
+    { nome: "Refeições nutricionalmente adequadas...", unidades: ["SEAS"], indicadores: [{ nome: "refeições fornecidas", meta2027: "10 milhões de refeições fornecidas até 2027" }] },
+    { nome: "Pessoas em vulnerabilidade social capacitadas...", unidades: ["SEAS"], indicadores: [{ nome: "pessoas qualificadas integralmente", meta2027: "40 mil pessoas qualificadas integralmente até 2027" }] },
+    { nome: "Oferta de cursos profissionalizantes...", unidades: ["IDEP"], indicadores: [{ nome: "matrículas nos cursos técnicos de nível médio, qualificação profissional e formação inicial", meta2027: "70.500 matrículas nos cursos técnicos de nível médio, qualificação profissional e formação inicial até 2027" }] },
+    { nome: "Ofertar qualificação profissional para o sistema prisional", unidades: ["IDEP"], indicadores: [{ nome: "matrículas nos cursos de qualificação profissional e formação inicial", meta2027: "1.500 matrículas nos cursos de qualificação profissional e formação inicial até 2027" }] },
+    { nome: "Elevação do Desempenho de Proficiência...", unidades: ["SEDUC"], indicadores: [
+        { nome: "proficiência em Língua Portuguesa no Ensino Fundamental", meta2027: "40% de proficiência em Língua Portuguesa no Ensino Fundamental até 2027" },
+        { nome: "proficiência em Matemática no Ensino Fundamental", meta2027: "20% de proficiência em Matemática no Ensino Fundamental até 2027" },
+        { nome: "proficiência em Língua Portuguesa no Ensino Médio", meta2027: "30% de proficiência em Língua Portuguesa no Ensino Médio até 2027" },
+        { nome: "proficiência em Matemática no Ensino Médio", meta2027: "15% de proficiência em Matemática no Ensino Médio até 2027" }
+    ] },
+    { nome: "Aumento da arrecadação de impostos", unidades: ["SEFIN"], indicadores: [{ nome: "arrecadação (Receitas LOA)", meta2027: "R$ 10.108.465.678,00 de arrecadação até 2027" }] },
+    { nome: "Crescimento dos recursos de hardware...", unidades: ["SETIC"], indicadores: [{ nome: "índice de capacidade de armazenamento", meta2027: "150% no índice de capacidade de armazenamento até 2027" }] },
+    { nome: "Fornecer o link de INFOVIA...", unidades: ["SETIC"], indicadores: [{ nome: "cidades atendidas com a INFOVIA", meta2027: "9 cidades atendidas com a INFOVIA até 2027" }] },
+    { nome: "Melhoria da qualidade dos serviços digitais...", unidades: ["SETIC"], indicadores: [{ nome: "índice de maturidade ABEP-TIC", meta2027: "índice 135 em maturidade ABEP-TIC até 2027" }] },
+    { nome: "Encerramento dos lixões e ações de resíduos sólidos", unidades: ["SEDAM"], indicadores: [
+        { nome: "lixões encerrados", meta2027: "26 lixões encerrados até 2027" },
+        { nome: "vistorias realizadas em lixões encerrados", meta2027: "26 vistorias realizadas em lixões encerrados até 2027" },
+        { nome: "servidores da SEDAM e dos municípios capacitados", meta2027: "125 servidores da SEDAM e dos municípios capacitados até 2027" },
+        { nome: "diagnósticos de áreas de lixões", meta2027: "52 diagnósticos de áreas de lixões até 2027" }
+    ] },
+    { nome: "Áreas rurais regularizadas", unidades: ["SEPAT"], indicadores: [
+        { nome: "hectares rurais georreferenciados", meta2027: "100 mil hectares rurais georreferenciados até 2027" },
+        { nome: "vistorias em lotes", meta2027: "3 mil vistorias em lotes até 2027" },
+        { nome: "pendências em lotes reduzidas", meta2027: "12 mil pendências em lotes reduzidas até 2027" },
+        { nome: "núcleos urbanos e secundários destinados", meta2027: "100 núcleos urbanos e secundários destinados até 2027" },
+        { nome: "documentos titulatórios emitidos", meta2027: "12 mil documentos titulatórios emitidos até 2027" },
+        { nome: "convênios/termos formalizados", meta2027: "08 convênios/termos formalizados até 2027" }
+    ] },
+    { nome: "Núcleos urbanos regularizados", unidades: ["SEPAT"], indicadores: [
+        { nome: "lotes regularizados", meta2027: "4.150 lotes regularizados até 2027" },
+        { nome: "imóveis titulados", meta2027: "2.550 imóveis titulados até 2027" }
+    ] },
+    { nome: "Unidades de Saúde em pleno funcionamento (HEURO/CEPEM)", unidades: ["SESAU"], indicadores: [{ nome: "unidades de saúde em pleno funcionamento", meta2027: "100% das Unidades de Saúde em pleno funcionamento (HEURO e CEPEM) até 2027" }] },
+    { nome: "Unidades de Saúde em pleno funcionamento (HICD/CEMETRON...)", unidades: ["SESAU"], indicadores: [{ nome: "unidades de saúde em pleno funcionamento", meta2027: "100% das Unidades de Saúde em pleno funcionamento (HICD, CEMETRON, Guajará-Mirim, Ariquemes) até 2027" }] },
+    { nome: "Redução de homicídios dolosos", unidades: ["SESDEC"], indicadores: [{ nome: "taxa de homicídios (por 100 mil habitantes)", meta2027: "Taxa de 21,7 homicídios por 100 mil habitantes até 2027" }] },
+    { nome: "Redução de roubos", unidades: ["SESDEC"], indicadores: [{ nome: "taxa de roubo consumado (por 100 mil habitantes)", meta2027: "Taxa de 834,8 roubos consumados por 100 mil habitantes até 2027" }] },
+    { nome: "Redução de lesões corporais - violência doméstica", unidades: ["SESDEC"], indicadores: [{ nome: "taxa de lesão corporal relacionada à violência doméstica (por 100 mil habitantes)", meta2027: "Taxa de 242,3 lesões corporais por 100 mil habitantes até 2027" }] },
+    { nome: "Redução da violência no campo", unidades: ["SESDEC"], indicadores: [{ nome: "taxa de violência no campo", meta2027: "Taxa de 40,3 crimes de violência no campo até 2027" }] },
+    { nome: "Edificações da Segurança Pública", unidades: ["SESDEC"], indicadores: [{ nome: "quantidade de edificações ampliadas, adequadas, modernizadas", meta2027: "100% da quantidade de ampliação, adequação e modernização de edificações até 2027" }] },
+    { nome: "Central de Monitoração Eletrônica...", unidades: ["SEJUS"], indicadores: [{ nome: "pessoas monitoradas com tornozeleiras eletrônicas", meta2027: "75% de pessoas monitoradas com tornozeleiras eletrônicas até 2027" }] },
+    { nome: "Complexo de Perícias Criminais", unidades: ["POLITEC"], indicadores: [
+        { nome: "índice de produtividade pericial anual", meta2027: "IPA=1 no índice de produtividade anual até 2027" },
+        { nome: "laboratórios instalados", meta2027: "100% dos laboratórios instalados até 2027" }
+    ] }
 ];
 
 var PROJETOS = [
@@ -373,12 +411,44 @@ function escapeHtml(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;'
 function unidadeAtual() { var s = document.getElementById('orgao'); return s ? s.value : ''; }
 function filtrarPorUnidade(lista, unidade) { return unidade ? lista.filter(function(i) { return i.unidades.includes(unidade); }) : []; }
 
+function permitirApenasNumeros(input) {
+    var valor = input.value;
+    var novoValor = valor.replace(/[^0-9.,%]/g, '');
+    if (valor !== novoValor) input.value = novoValor;
+}
+
+function parseCurrency(valStr) {
+    if (!valStr) return 0;
+    var limpo = String(valStr).replace(/R\$/g, '').replace(/\./g, '').replace(/,/g, '.').replace(/[^0-9.]/g, '').trim();
+    var num = parseFloat(limpo);
+    return isNaN(num) ? 0 : num;
+}
+
+function formatCurrency(val) {
+    return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function limparDados() {
+    if (!confirm("⚠️ Tem certeza que deseja limpar TODOS os dados preenchidos?\n\nEsta ação não pode ser desfeita.")) return;
+    document.getElementById('orgao').value = '';
+    document.getElementById('responsavel').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('oficioEnvio').value = '';
+    document.getElementById('resultados-container').innerHTML = '';
+    document.getElementById('projetos-container').innerHTML = '';
+    document.getElementById('mapa-container').innerHTML = '';
+    document.getElementById('blocoMAPA').style.display = 'none';
+    document.getElementById('resultado-area').style.display = 'none';
+    document.getElementById('avisoResultadosUnidade').style.display = 'block';
+    document.getElementById('avisoProjetosUnidade').style.display = 'block';
+    contResultado = 0; contProjeto = 0; contIndicador = 0; contAcao = 0;
+    alert('✅ Dados limpos! Você pode começar um novo monitoramento.');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function carregarDados() {
     var status = document.getElementById('statusCarregamento');
-    status.style.display = 'block';
-    status.className = 'status-sync status-info';
-    status.textContent = 'Carregando dados do sistema...';
-
+    status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Carregando dados do sistema...';
     fetch(URL_GOOGLE + "?token=" + encodeURIComponent(TOKEN_ACESSO) + "&acao=carregar")
         .then(function(r) { return r.json(); })
         .then(function(data) {
@@ -386,16 +456,13 @@ function carregarDados() {
                 if (data.parametros) aplicarParametros(data.parametros);
                 if (data.projetos_config) PROJETOS_CONFIG = data.projetos_config;
                 if (data.oficios_unidades) OFICIOS_UNIDADES = data.oficios_unidades;
-                
-                status.className = 'status-sync status-ok';
-                status.textContent = '✅ Base central carregada.';
+                status.className = 'status-sync status-ok'; status.textContent = '✅ Base central carregada.';
                 setTimeout(function(){ status.style.display = 'none'; }, 2000);
             } else { throw new Error(data.message); }
         })
         .catch(function(err) {
             aplicarParametros({ periodo_referencia: periodoReferencia, oficio_base: oficioBaseGlobal, destinatario_nome: destinatarioNome, destinatario_cargo: destinatarioCargo, destinatario_genero: destinatarioGenero });
-            status.className = 'status-sync status-erro';
-            status.textContent = '⚠️ Modo Offline: ' + err.message;
+            status.className = 'status-sync status-erro'; status.textContent = '⚠️ Modo Offline: ' + err.message;
             setTimeout(function(){ status.style.display = 'none'; }, 5000);
         });
 }
@@ -419,16 +486,19 @@ function abrirAdmin() {
     document.getElementById('inputDestNome').value = destinatarioNome;
     document.getElementById('inputDestCargo').value = destinatarioCargo;
     document.getElementById('inputDestGenero').value = destinatarioGenero;
-
     var selMapa = document.getElementById('mapaUnidade');
     var selConfig = document.getElementById('configProjSelect');
     var selOficio = document.getElementById('oficioUnidade');
+    var selFiltroMon = document.getElementById('filtroMonUnidade');
     if (selMapa.options.length <= 1) { UNIDADES.forEach(function(u){ var o = document.createElement('option'); o.value = u; o.textContent = u; selMapa.appendChild(o); }); }
     if (selOficio.options.length === 0) { UNIDADES.forEach(function(u){ var o = document.createElement('option'); o.value = u; o.textContent = u; selOficio.appendChild(o); }); }
+    if (selFiltroMon.options.length <= 1) { UNIDADES.forEach(function(u){ var o = document.createElement('option'); o.value = u; o.textContent = u; selFiltroMon.appendChild(o); }); }
     if (selConfig.options.length === 0) { selConfig.innerHTML = '<option value="">Selecione o Projeto...</option>'; PROJETOS.forEach(function(p){ selConfig.innerHTML += '<option value="' + escapeHtml(p.nome) + '">' + escapeHtml(p.nome) + '</option>'; }); }
-
     carregarAdminMAPA();
     renderizarOficios();
+    document.getElementById('configFontesList').innerHTML = '';
+    contFonteConfig = 0;
+    adicionarFonteConfig();
 }
 
 function fecharAdmin() {
@@ -439,8 +509,9 @@ function fecharAdmin() {
 function trocarAba(aba) {
     document.querySelectorAll('.aba-conteudo').forEach(function(el){ el.classList.remove('ativa'); });
     document.querySelectorAll('.btn-aba').forEach(function(el){ el.classList.remove('ativa'); });
-    var map = { 'monitoramento': { c: 'abaMonitoramento', b: 'abaBtnMonitoramento' }, 'mapa': { c: 'abaMapa', b: 'abaBtnMapa' }, 'projetos': { c: 'abaProjetos', b: 'abaBtnProjetos' }, 'oficios': { c: 'abaOficios', b: 'abaBtnOficios' } };
+    var map = { 'monitoramento': { c: 'abaMonitoramento', b: 'abaBtnMonitoramento' }, 'mapa': { c: 'abaMapa', b: 'abaBtnMapa' }, 'projetos': { c: 'abaProjetos', b: 'abaBtnProjetos' }, 'oficios': { c: 'abaOficios', b: 'abaBtnOficios' }, 'monitoramentos': { c: 'abaMonitoramentos', b: 'abaBtnMonitoramentos' } };
     if (map[aba]) { document.getElementById(map[aba].c).classList.add('ativa'); document.getElementById(map[aba].b).classList.add('ativa'); }
+    if (aba === 'monitoramentos') { carregarMonitoramentosAnteriores(); }
 }
 
 function publicarParametros() {
@@ -464,22 +535,37 @@ function publicarParametros() {
 function carregarConfigProjeto() {
     var nome = document.getElementById('configProjSelect').value;
     if (!nome) return;
+    document.getElementById('configFontesList').innerHTML = '';
+    contFonteConfig = 0;
     var config = PROJETOS_CONFIG[nome];
     if (config) {
         document.getElementById('configProjPPA').value = config.ppa_loa || '';
-        document.getElementById('configProjFonte').value = config.fonte || '';
-        document.getElementById('configProjRecursoPrev').value = config.recurso_previsto || '';
         document.getElementById('configTarefasInicial').value = (config.fases.inicial || []).join('\n');
         document.getElementById('configTarefasInter').value = (config.fases.intermediaria || []).join('\n');
         document.getElementById('configTarefasFinal').value = (config.fases.final || []).join('\n');
+        if (config.fontes && config.fontes.length > 0) { config.fontes.forEach(function(f) { adicionarFonteConfig(f.codigo, f.previsto); }); } else { adicionarFonteConfig(); }
     } else {
         document.getElementById('configProjPPA').value = '';
-        document.getElementById('configProjFonte').value = '';
-        document.getElementById('configProjRecursoPrev').value = '';
         document.getElementById('configTarefasInicial').value = (CRONOGRAMA_PADRAO.inicial).join('\n');
         document.getElementById('configTarefasInter').value = (CRONOGRAMA_PADRAO.intermediaria).join('\n');
         document.getElementById('configTarefasFinal').value = (CRONOGRAMA_PADRAO.final).join('\n');
+        adicionarFonteConfig();
     }
+}
+
+// ========== MUDANÇA 1: FONTE EDITÁVEL NO ADMIN ==========
+function adicionarFonteConfig(codigo, previsto) {
+    contFonteConfig++;
+    var idFonte = contFonteConfig;
+    var div = document.createElement('div');
+    div.className = 'fonte-box'; div.id = 'config-fonte-' + idFonte;
+    var datalistId = 'datalist-admin-' + idFonte;
+    var opcoesDatalist = '';
+    for (var i = 0; i < FONTES_RECURSO.length; i++) {
+        opcoesDatalist += '<option value="' + escapeHtml(FONTES_RECURSO[i]) + '"></option>';
+    }
+    div.innerHTML = '<button type="button" class="btn-remove" onclick="removerItem(\'config-fonte-' + idFonte + '\')">Remover</button><div class="grid-2" style="margin-top:8px;"><div><label>Fonte de Recurso</label><input type="text" id="config-fonte-cod-' + idFonte + '" value="' + escapeHtml(codigo || '') + '" list="' + datalistId + '" placeholder="Selecione ou digite..."><datalist id="' + datalistId + '">' + opcoesDatalist + '</datalist></div><div><label>Recurso Previsto (R$)</label><input type="text" id="config-fonte-prev-' + idFonte + '" value="' + (previsto || '') + '" placeholder="Ex.: 1.000.000,00" oninput="permitirApenasNumeros(this)"></div></div>';
+    document.getElementById('configFontesList').appendChild(div);
 }
 
 function salvarProjetoConfig() {
@@ -487,35 +573,30 @@ function salvarProjetoConfig() {
     if (!nome) return alert("Selecione um projeto.");
     var status = document.getElementById('statusProjConfig');
     status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Salvando...';
-    var config = {
-        ppa_loa: document.getElementById('configProjPPA').value,
-        fonte: document.getElementById('configProjFonte').value,
-        recurso_previsto: document.getElementById('configProjRecursoPrev').value,
-        fases: {
-            inicial: document.getElementById('configTarefasInicial').value.split('\n').filter(Boolean),
-            intermediaria: document.getElementById('configTarefasInter').value.split('\n').filter(Boolean),
-            final: document.getElementById('configTarefasFinal').value.split('\n').filter(Boolean),
-            concluido: ["Implementação Final"]
-        }
-    };
+    var fontes = [];
+    var fontesBoxes = document.querySelectorAll('#configFontesList .fonte-box');
+    for (var i = 0; i < fontesBoxes.length; i++) {
+        var idF = fontesBoxes[i].id.replace('config-fonte-', '');
+        var cod = document.getElementById('config-fonte-cod-' + idF).value;
+        var prev = document.getElementById('config-fonte-prev-' + idF).value;
+        if (cod) fontes.push({ codigo: cod, previsto: parseCurrency(prev) });
+    }
+    if (fontes.length === 0) { status.className = 'status-sync status-erro'; status.textContent = 'Erro: Adicione pelo menos uma fonte.'; return; }
+    var config = { ppa_loa: document.getElementById('configProjPPA').value, fontes: fontes, fases: { inicial: document.getElementById('configTarefasInicial').value.split('\n').filter(Boolean), intermediaria: document.getElementById('configTarefasInter').value.split('\n').filter(Boolean), final: document.getElementById('configTarefasFinal').value.split('\n').filter(Boolean), concluido: ["Implementação Final"] } };
     var formData = new URLSearchParams();
-    formData.append('token', TOKEN_ACESSO);
-    formData.append('tipo', 'salvar_projeto_config');
-    formData.append('nome_projeto', nome);
-    formData.append('config_json', JSON.stringify(config));
+    formData.append('token', TOKEN_ACESSO); formData.append('tipo', 'salvar_projeto_config'); formData.append('nome_projeto', nome); formData.append('config_json', JSON.stringify(config));
     fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
     .then(function(r){ return r.json(); })
-    .then(function(data){
-        if(data.result === 'success') { status.className = 'status-sync status-ok'; status.textContent = '✅ Configuração salva!'; PROJETOS_CONFIG[nome] = config; } else { throw new Error(data.message); }
-    }).catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
+    .then(function(data){ if(data.result === 'success') { status.className = 'status-sync status-ok'; status.textContent = '✅ Configuração salva!'; PROJETOS_CONFIG[nome] = config; } else { throw new Error(data.message); } })
+    .catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
 }
 
 function adicionarOficioUnidade() {
     var unidade = document.getElementById('oficioUnidade').value;
-    var numero = document.getElementById('oficioNumero').value.trim();
-    if (!unidade || !numero) return alert("Preencha unidade e número do ofício.");
-    OFICIOS_UNIDADES[unidade] = numero;
-    document.getElementById('oficioNumero').value = '';
+    var envio = document.getElementById('oficioNumeroEnvio').value.trim();
+    if (!unidade || !envio) return alert("Preencha unidade e ofício de envio.");
+    OFICIOS_UNIDADES[unidade] = { envio: envio, resposta: '' };
+    document.getElementById('oficioNumeroEnvio').value = '';
     renderizarOficios();
     alert("Ofício vinculado localmente. Clique em 'Publicar Ofícios no Google' para salvar.");
 }
@@ -531,8 +612,8 @@ function renderizarOficios() {
     var div = document.getElementById('listaOficios');
     var keys = Object.keys(OFICIOS_UNIDADES);
     if (keys.length === 0) { div.innerHTML = '<em style="color:#888;">Nenhum ofício cadastrado ainda.</em>'; return; }
-    var html = '<table style="width:100%; border-collapse:collapse; font-size:0.9em;"><thead><tr style="background:#e0e0e0;"><th>Unidade</th><th>Ofício</th><th>Ação</th></tr></thead><tbody>';
-    keys.sort().forEach(function(u) { html += '<tr><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(u) + '</td><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(OFICIOS_UNIDADES[u]) + '</td><td style="border:1px solid #ccc; padding:6px; text-align:center;"><button type="button" class="btn-remove" style="float:none;" onclick="removerOficioUnidade(\'' + u + '\')">Remover</button></td></tr>'; });
+    var html = '<table style="width:100%; border-collapse:collapse; font-size:0.9em;"><thead><tr style="background:#e0e0e0;"><th>Unidade</th><th>Ofício de Envio</th><th>Ação</th></tr></thead><tbody>';
+    keys.sort().forEach(function(u) { var of = OFICIOS_UNIDADES[u]; html += '<tr><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(u) + '</td><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(of.envio) + '</td><td style="border:1px solid #ccc; padding:6px; text-align:center;"><button type="button" class="btn-remove" style="float:none;" onclick="removerOficioUnidade(\'' + u + '\')">Remover</button></td></tr>'; });
     html += '</tbody></table>';
     div.innerHTML = html;
 }
@@ -541,14 +622,46 @@ function publicarOficios() {
     var status = document.getElementById('statusOficios');
     status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Publicando...';
     var formData = new URLSearchParams();
-    formData.append('token', TOKEN_ACESSO);
-    formData.append('tipo', 'publicar_oficios');
-    formData.append('oficios_json', JSON.stringify(OFICIOS_UNIDADES));
+    formData.append('token', TOKEN_ACESSO); formData.append('tipo', 'publicar_oficios'); formData.append('oficios_json', JSON.stringify(OFICIOS_UNIDADES));
     fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
     .then(function(r){ return r.json(); })
-    .then(function(data){
-        if(data.result === 'success') { status.className = 'status-sync status-ok'; status.textContent = '✅ Ofícios salvos!'; } else { throw new Error(data.message); }
-    }).catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
+    .then(function(data){ if(data.result === 'success') { status.className = 'status-sync status-ok'; status.textContent = '✅ Ofícios salvos!'; } else { throw new Error(data.message); } })
+    .catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
+}
+
+function carregarMonitoramentosAnteriores() {
+    var unidade = document.getElementById('filtroMonUnidade').value;
+    var div = document.getElementById('listaMonitoramentos');
+    div.innerHTML = '<em>Buscando...</em>';
+    var url = URL_GOOGLE + "?token=" + encodeURIComponent(TOKEN_ACESSO) + "&acao=carregar_submissoes_unidade&unidade=" + unidade;
+    fetch(url).then(function(r){ return r.json(); }).then(function(data){
+        if (data.result === 'success') {
+            var html = '<table style="width:100%; border-collapse:collapse; font-size:0.85em;"><thead><tr style="background:#e0e0e0;"><th>ID</th><th>Data</th><th>Unidade</th><th>Período</th><th>Ofício Envio</th><th>Ofício de Resposta (digite para validar)</th><th>Validado</th><th>Ação</th></tr></thead><tbody>';
+            data.submissoes.forEach(function(s) {
+                var badge = s.validado === 'Sim' ? '<span style="color:#0B875B; font-weight:bold;">✅ Validado</span>' : '<span style="color:#e67e22;">⏳ Pendente</span>';
+                var celulaOficioResp = s.validado === 'Sim' ? escapeHtml(s.oficio_resposta || '-') : '<input type="text" id="oficio-resp-' + s.id_submissao + '" placeholder="Digite o Ofício de Resposta" style="padding:5px; font-size:0.9em; width:100%; border:1px solid #ccc; border-radius:3px;">';
+                var btn = s.validado !== 'Sim' ? '<button onclick="validarSubmissao(\'' + s.id_submissao + '\')" class="btn-success" style="padding:4px 10px; font-size:0.85em;">Validar</button>' : '-';
+                var dataStr = s.timestamp ? new Date(s.timestamp).toLocaleString('pt-BR') : '-';
+                html += '<tr><td style="border:1px solid #ccc; padding:6px; font-size:0.85em;">' + escapeHtml(s.id_submissao) + '</td><td style="border:1px solid #ccc; padding:6px;">' + dataStr + '</td><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(s.unidade) + '</td><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(s.periodo) + '</td><td style="border:1px solid #ccc; padding:6px;">' + escapeHtml(s.oficio_envio || '-') + '</td><td style="border:1px solid #ccc; padding:6px;">' + celulaOficioResp + '</td><td style="border:1px solid #ccc; padding:6px; text-align:center;">' + badge + '</td><td style="border:1px solid #ccc; padding:6px; text-align:center;">' + btn + '</td></tr>';
+            });
+            html += '</tbody></table>';
+            div.innerHTML = html;
+        } else { div.innerHTML = '<em style="color:#a00;">Erro: ' + data.message + '</em>'; }
+    }).catch(function(err){ div.innerHTML = '<em style="color:#a00;">Erro de conexão: ' + err.message + '</em>'; });
+}
+
+function validarSubmissao(idSubmissao) {
+    var inputOficio = document.getElementById('oficio-resp-' + idSubmissao);
+    var oficioResposta = inputOficio ? inputOficio.value.trim() : '';
+    if (!oficioResposta) return alert("⚠️ Digite o Ofício de Resposta antes de validar.");
+    var validadoPor = prompt("Seu nome (para registro de auditoria):");
+    if (!validadoPor) return;
+    var formData = new URLSearchParams();
+    formData.append('token', TOKEN_ACESSO); formData.append('tipo', 'validar_submissao'); formData.append('id_submissao', idSubmissao); formData.append('validado_por', validadoPor); formData.append('oficio_resposta', oficioResposta);
+    fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+    .then(function(r){ return r.json(); })
+    .then(function(data){ if (data.result === 'success') { alert('✅ Submissão validada com sucesso!'); carregarMonitoramentosAnteriores(); } else { alert('Erro: ' + data.message); } })
+    .catch(function(err){ alert('Erro: ' + err.message); });
 }
 
 function aoTrocarUnidade() {
@@ -558,8 +671,14 @@ function aoTrocarUnidade() {
     if (unidade) {
         if(avisoRes) avisoRes.style.display = 'none';
         if(avisoProj) avisoProj.style.display = 'none';
-        var oficioDaUnidade = OFICIOS_UNIDADES[unidade] || oficioBaseGlobal;
-        document.getElementById('infoOficio').textContent = "Ofício Base: " + oficioDaUnidade;
+        var oficios = OFICIOS_UNIDADES[unidade];
+        if (oficios) {
+            document.getElementById('oficioEnvio').value = oficios.envio || '';
+            document.getElementById('infoOficio').textContent = "Ofício Base: " + (oficios.envio || oficioBaseGlobal);
+        } else {
+            document.getElementById('oficioEnvio').value = oficioBaseGlobal;
+            document.getElementById('infoOficio').textContent = "Ofício Base: " + oficioBaseGlobal;
+        }
     } else {
         if(avisoRes) avisoRes.style.display = 'block';
         if(avisoProj) avisoProj.style.display = 'block';
@@ -613,9 +732,7 @@ function carregarIndicadores(idResultado) {
             var idInd = contIndicador;
             var div = document.createElement('div');
             div.className = 'indicador-box'; div.id = 'ind-box-' + idInd;
-            var metaTexto = ind;
-            if (!ind.toLowerCase().includes('até 2027')) { metaTexto = ind + ' até 2027'; }
-            div.innerHTML = '<div class="ind-titulo">Indicador</div><div><input type="text" id="ind-nome-' + idInd + '" value="' + escapeHtml(ind) + '" readonly></div><div class="grid-3" style="margin-top:10px;"><div><label>Meta 2027</label><input type="text" id="ind-meta2027-' + idInd + '" value="' + escapeHtml(metaTexto) + '"></div><div><label>Meta 2026</label><input type="text" id="ind-meta2026-' + idInd + '"></div><div><label>Valor Alcançado</label><input type="text" id="ind-valor-' + idInd + '"></div></div>';
+            div.innerHTML = '<div style="font-size:0.85em; font-weight:bold; color:#17a2b8; margin-bottom:8px;">Indicador</div><div><input type="text" id="ind-nome-' + idInd + '" value="' + escapeHtml(ind.nome) + '" readonly></div><div class="grid-3" style="margin-top:10px;"><div><label>Meta 2027</label><input type="text" id="ind-meta2027-' + idInd + '" value="' + escapeHtml(ind.meta2027) + '"></div><div><label>Meta para este ano</label><input type="text" id="ind-meta2026-' + idInd + '" placeholder="Digite o valor" oninput="permitirApenasNumeros(this)"></div><div><label>Valor Alcançado</label><input type="text" id="ind-valor-' + idInd + '" placeholder="Digite o valor" oninput="permitirApenasNumeros(this)"></div></div>';
             container.appendChild(div);
         });
     }
@@ -641,8 +758,8 @@ function atualizarTarefasProjeto(idProjeto) {
     if (!nome) { box.style.display = 'none'; containerAcoes.innerHTML = ''; return; }
     box.style.display = 'block';
     var config = PROJETOS_CONFIG[nome];
-    if (config) { containerAcoes.innerHTML = ''; adicionarAcaoOrcamentaria(idProjeto, true, config.ppa_loa, config.fonte, config.recurso_previsto); } else { containerAcoes.innerHTML = ''; adicionarAcaoOrcamentaria(idProjeto, false, '', '', ''); }
-    toggleManualPct(idProjeto); 
+    if (config) { containerAcoes.innerHTML = ''; adicionarAcaoOrcamentaria(idProjeto, true, config.ppa_loa, config.fontes || []); } else { containerAcoes.innerHTML = ''; adicionarAcaoOrcamentaria(idProjeto, false, '', []); }
+    toggleManualPct(idProjeto);
 }
 
 function toggleManualPct(idProjeto) {
@@ -690,20 +807,35 @@ function recalcularProgresso(idProjeto) {
     if(fill) { fill.style.width = pct + '%'; fill.textContent = pct + '%'; }
 }
 
-function adicionarAcaoOrcamentaria(idProjeto, bloqueado, ppa, fonte, recursoPrev) {
+// ========== MUDANÇA 2: FONTE EDITÁVEL NO MONITORAMENTO (modo manual) ==========
+function adicionarAcaoOrcamentaria(idProjeto, bloqueado, ppa, fontesConfig) {
     contAcao++;
     var idAcao = contAcao;
     var container = document.getElementById('acoes-container-' + idProjeto);
     if (!container) return;
     var div = document.createElement('div');
     div.className = 'acao-box'; div.id = 'acao-box-' + idAcao;
-    var datalistId = 'fontes-datalist-' + idAcao;
-    var opcoesFonte = '';
-    for (var i = 0; i < FONTES_RECURSO.length; i++) opcoesFonte += '<option value="' + escapeHtml(FONTES_RECURSO[i]) + '"></option>';
     var htmlRemover = bloqueado ? '' : '<button type="button" class="btn-remove" onclick="removerItem(\'acao-box-' + idAcao + '\')">Remover</button>';
     var readonlyAttr = bloqueado ? 'readonly' : '';
     var bgReadonly = bloqueado ? 'background:#e9ecef; color:#666;' : '';
-    div.innerHTML = htmlRemover + '<div class="acao-titulo">Ação Orçamentária ' + (bloqueado ? '(Definida pela SEPOG)' : '') + '</div><div class="grid-2" style="margin-top:8px;"><div><label>PPA/LOA</label><input type="text" id="acao-ppa-' + idAcao + '" value="' + ppa + '" ' + readonlyAttr + ' style="' + bgReadonly + '"></div><div><label>Fonte</label><input type="text" id="acao-fonte-' + idAcao + '" value="' + fonte + '" ' + readonlyAttr + ' list="' + datalistId + '" style="' + bgReadonly + '"><datalist id="' + datalistId + '">' + opcoesFonte + '</datalist></div></div><div class="grid-2" style="margin-top:8px;"><div><label>Recurso Previsto</label><input type="text" id="acao-prev-' + idAcao + '" value="' + recursoPrev + '" ' + readonlyAttr + ' style="' + bgReadonly + '"></div><div><label>Recurso Executado</label><input type="text" id="acao-exec-' + idAcao + '"></div></div>';
+    
+    var htmlFontes = '';
+    if (fontesConfig && fontesConfig.length > 0) {
+        fontesConfig.forEach(function(f, idx) {
+            var fid = idAcao + '_' + idx;
+            htmlFontes += '<div class="fonte-box"><div style="font-size:0.85em; font-weight:bold; color:#17a2b8; margin-bottom:5px;">Fonte: ' + escapeHtml(f.codigo) + '</div><div class="grid-2"><div><label>Recurso Previsto</label><input type="text" id="acao-fonte-prev-' + fid + '" value="' + formatCurrency(f.previsto || 0) + '" readonly style="' + bgReadonly + '"></div><div><label>Recurso Executado</label><input type="text" id="acao-fonte-exec-' + fid + '" placeholder="0,00" oninput="permitirApenasNumeros(this)"></div></div></div>';
+        });
+    } else {
+        var fid = idAcao + '_livre';
+        var datalistId = 'datalist-acao-' + fid;
+        var opcoesDatalist = '';
+        for (var i = 0; i < FONTES_RECURSO.length; i++) {
+            opcoesDatalist += '<option value="' + escapeHtml(FONTES_RECURSO[i]) + '"></option>';
+        }
+        htmlFontes += '<div class="fonte-box"><div><label>Fonte de Recurso</label><input type="text" id="acao-fonte-sel-' + fid + '" list="' + datalistId + '" placeholder="Selecione ou digite a fonte..."><datalist id="' + datalistId + '">' + opcoesDatalist + '</datalist></div><div class="grid-2" style="margin-top:8px;"><div><label>Recurso Previsto</label><input type="text" id="acao-fonte-prev-' + fid + '" placeholder="0,00" ' + readonlyAttr + ' style="' + bgReadonly + '" oninput="permitirApenasNumeros(this)"></div><div><label>Recurso Executado</label><input type="text" id="acao-fonte-exec-' + fid + '" placeholder="0,00" oninput="permitirApenasNumeros(this)"></div></div></div>';
+    }
+    
+    div.innerHTML = htmlRemover + '<div style="font-size:0.85em; font-weight:bold; color:#6f42c1; margin-bottom:8px;">Ação Orçamentária ' + (bloqueado ? '(Definida pela SEPOG)' : '') + '</div><div style="margin-bottom:10px;"><label>PPA/LOA</label><input type="text" id="acao-ppa-' + idAcao + '" value="' + ppa + '" ' + readonlyAttr + ' style="' + bgReadonly + '"></div><div style="margin-top:10px;"><label>Fontes de Recurso</label>' + htmlFontes + '</div>';
     container.appendChild(div);
 }
 
@@ -779,39 +911,34 @@ function adicionarProblemaMAPA() {
 function arquivarMAPA(idProblema) {
     if (!confirm("Tem certeza que deseja ARQUIVAR este problema?")) return;
     var formData = new URLSearchParams();
-    formData.append('token', TOKEN_ACESSO);
-    formData.append('tipo', 'arquivar_mapa');
-    formData.append('id_mapa', idProblema);
+    formData.append('token', TOKEN_ACESSO); formData.append('tipo', 'arquivar_mapa'); formData.append('id_mapa', idProblema);
     fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
     .then(function(r){ return r.json(); })
-    .then(function(data){
-        if(data.result === 'success') { alert("✅ Arquivado!"); carregarAdminMAPA(); } else { alert("Erro: " + data.message); }
-    }).catch(function(err){ alert("Erro: " + err.message); });
+    .then(function(data){ if(data.result === 'success') { alert("✅ Arquivado!"); carregarAdminMAPA(); } else { alert("Erro: " + data.message); } })
+    .catch(function(err){ alert("Erro: " + err.message); });
 }
 
 function publicarMAPACadastro() {
     var status = document.getElementById('statusPublicacao');
     status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Publicando...';
     var formMapa = new URLSearchParams();
-    formMapa.append('token', TOKEN_ACESSO);
-    formMapa.append('tipo', 'publicar_mapa');
+    formMapa.append('token', TOKEN_ACESSO); formMapa.append('tipo', 'publicar_mapa');
     formMapa.append('lista_mapa', JSON.stringify(MAPA_CADASTRO_ADMIN.map(function(m) { return { id: m.id, unidade: m.unidade, problema: m.problema, acompanhamento: m.acompanhamento, ativo: true }; })));
     fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formMapa.toString() })
     .then(function(r){ return r.json(); })
-    .then(function(data){
-        if(data.result === 'success') { status.className = 'status-sync status-ok'; status.textContent = '✅ Publicado!'; carregarAdminMAPA(); } else { throw new Error(data.message); }
-    }).catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
+    .then(function(data){ if(data.result === 'success') { status.className = 'status-sync status-ok'; status.textContent = '✅ Publicado!'; carregarAdminMAPA(); } else { throw new Error(data.message); } })
+    .catch(function(err){ status.className = 'status-sync status-erro'; status.textContent = 'Erro: ' + err.message; });
 }
 
 function gerarResumo() {
     var orgao = unidadeAtual();
     if (!orgao) { alert('Selecione a unidade.'); return; }
-    var oficioParaUsar = OFICIOS_UNIDADES[orgao] || oficioBaseGlobal;
+    var oficioParaUsar = document.getElementById('oficioEnvio').value || oficioBaseGlobal;
     var tratamento = destinatarioGenero === "F" ? "a Senhora" : "o Senhor";
     var saudacao = destinatarioGenero === "F" ? "Senhora Secretária" : "Senhor Secretário";
     var enderecamento = '<div class="enderecamento"><p>À Sua Excelência, ' + tratamento + ',</p><p class="destinatario-nome">' + escapeHtml(destinatarioNome) + '</p><p class="destinatario-cargo">' + escapeHtml(destinatarioCargo) + '</p></div>';
     var textoOficio = enderecamento + '<p class="recuo-tab"><strong>Assunto: Informações quadrimestrais dos indicadores de resultado do Planejamento Estratégico.</strong></p><p class="recuo-tab">' + saudacao + ',</p><p>Com cordiais cumprimentos, vimos por meio deste encaminhar as informações atualizadas referentes ao monitoramento do Plano Estratégico do Estado de Rondônia, relativas ao <strong>' + periodoReferencia + '</strong>, conforme solicitado no Ofício nº ' + escapeHtml(oficioParaUsar) + '.</p><p>As informações prestadas pela unidade <strong>' + orgao + '</strong> encontram-se detalhadas nas tabelas abaixo:</p>';
-    var tabelaResultados = '<thead><tr><th>Resultados</th><th>Indicador</th><th>Meta para 2027</th><th>Meta para 2026</th><th>Valor Alcançado</th><th>Informações Qualitativas</th></tr></thead><tbody>';
+    var tabelaResultados = '<thead><tr><th>Resultados</th><th>Indicador</th><th>Meta 2027</th><th>Meta para este ano</th><th>Valor Alcançado</th><th>Informações Qualitativas</th></tr></thead><tbody>';
     document.querySelectorAll('#resultados-container .item-box').forEach(function(box){
         var id = box.id.replace('res-box-', '');
         var res = document.getElementById('res-resultado-' + id).value;
@@ -819,10 +946,10 @@ function gerarResumo() {
         if (!res) return;
         var indBoxes = box.querySelectorAll('.indicador-box');
         if (indBoxes.length === 0) { tabelaResultados += '<tr><td>' + escapeHtml(res) + '</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td>' + (info ? escapeHtml(info) : '-') + '</td></tr>'; }
-        else { indBoxes.forEach(function(indBox, k){ var idInd = indBox.id.replace('ind-box-', ''); tabelaResultados += '<tr><td>' + (k === 0 ? escapeHtml(res) : '') + '</td><td>' + escapeHtml(document.getElementById('ind-nome-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-meta2027-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-meta2026-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-valor-' + idInd).value) + '</td><td>' + (k === 0 ? (info ? escapeHtml(info) : '-') : '') + '</td></tr>'; }); }
+        else { indBoxes.forEach(function(indBox, k){ var idInd = indBox.id.replace('ind-box-', ''); tabelaResultados += '<tr><td>' + (k === 0 ? escapeHtml(res) : '') + '</td><td>' + escapeHtml(document.getElementById('ind-nome-' + idInd).value) + '</td><td>' + escapeHtml(document.getElementById('ind-meta2027-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-meta2026-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-valor-' + idInd).value) + '</td><td>' + (k === 0 ? (info ? escapeHtml(info) : '-') : '') + '</td></tr>'; }); }
     });
     tabelaResultados += '</tbody>';
-    var tabelaProjetos = '<thead><tr><th>Projeto</th><th>Fase / %</th><th>PPA/LOA</th><th>Fonte</th><th>Rec. Previsto</th><th>Rec. Executado</th><th>Qualitativos</th></tr></thead><tbody>';
+    var tabelaProjetos = '<thead><tr><th>Projeto</th><th>Fase / %</th><th>PPA/LOA</th><th>Fontes (Previsto / Executado)</th><th>Qualitativos</th></tr></thead><tbody>';
     var temProjeto = false;
     document.querySelectorAll('#projetos-container .item-box').forEach(function(box){
         var idp = box.id.replace('proj-box-', '');
@@ -835,9 +962,22 @@ function gerarResumo() {
         var mel = document.getElementById('proj-melhoria-' + idp).value.trim();
         var acoes = document.getElementById('proj-acoes-' + idp).value.trim();
         var qual = 'Dif: ' + (dif || '-') + '<br>Mel: ' + (mel || '-') + '<br>Ações: ' + (acoes || '-');
-        var acaoBoxes = box.querySelectorAll('.acao-box');
-        if (acaoBoxes.length === 0) { tabelaProjetos += '<tr><td>' + escapeHtml(proj) + '</td><td class="center">' + fasePct + '</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td>' + qual + '</td></tr>'; }
-        else { acaoBoxes.forEach(function(acaoBox, a){ var idA = acaoBox.id.replace('acao-box-', ''); tabelaProjetos += '<tr><td>' + (a === 0 ? escapeHtml(proj) : '') + '</td><td class="center">' + (a === 0 ? fasePct : '') + '</td><td>' + escapeHtml(document.getElementById('acao-ppa-' + idA).value) + '</td><td>' + escapeHtml(document.getElementById('acao-fonte-' + idA).value) + '</td><td class="center">' + escapeHtml(document.getElementById('acao-prev-' + idA).value) + '</td><td class="center">' + escapeHtml(document.getElementById('acao-exec-' + idA).value) + '</td><td>' + (a === 0 ? qual : '') + '</td></tr>'; }); }
+        var acaoBox = box.querySelector('.acao-box');
+        var ppa = '', fontesTxt = '';
+        if (acaoBox) {
+            var idA = acaoBox.id.replace('acao-box-', '');
+            ppa = document.getElementById('acao-ppa-' + idA).value;
+            acaoBox.querySelectorAll('.fonte-box').forEach(function(fb) {
+                var inputs = fb.querySelectorAll('input');
+                var inputFonte = fb.querySelector('input[id^="acao-fonte-sel-"]');
+                var labelFonte = fb.querySelector('div[style*="font-size:0.85em"]');
+                var prev = inputs[0] ? inputs[0].value : '';
+                var exec = inputs[1] ? inputs[1].value : '';
+                var codFonte = labelFonte ? labelFonte.textContent.replace('Fonte: ', '') : (inputFonte ? inputFonte.value : '');
+                if (codFonte) fontesTxt += codFonte + ': ' + prev + ' / ' + exec + '<br>';
+            });
+        }
+        tabelaProjetos += '<tr><td>' + escapeHtml(proj) + '</td><td class="center">' + fasePct + '</td><td>' + escapeHtml(ppa) + '</td><td>' + fontesTxt + '</td><td>' + qual + '</td></tr>';
     });
     tabelaProjetos += '</tbody>';
     var tabelaMAPA = '<thead><tr><th>ID</th><th>Problema</th><th>Providência</th><th>Status</th></tr></thead><tbody>';
@@ -876,12 +1016,11 @@ function copiarTexto() {
     var elFechamento = document.getElementById('fechamento-oficio');
     if (!elTexto) return alert('Gere o resumo primeiro.');
     var range = document.createRange();
-    range.setStartBefore(elTexto); 
+    range.setStartBefore(elTexto);
     if (elFechamento) range.setEndAfter(elFechamento);
     else range.setEndAfter(document.getElementById('tabela-mapa') ? document.getElementById('tabela-mapa').parentNode : elTexto);
     var sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+    sel.removeAllRanges(); sel.addRange(range);
     try { var sucesso = document.execCommand('copy'); if (sucesso) alert('✅ Ofício e tabelas copiados com a formatação original!'); else throw new Error('Falha'); }
     catch (err) { alert('⚠️ Use Ctrl+C manualmente.'); }
     sel.removeAllRanges();
@@ -891,7 +1030,7 @@ function baixarExcel() {
     var orgao = unidadeAtual();
     var responsavel = document.getElementById('responsavel').value.trim();
     var email = document.getElementById('email').value.trim();
-    var headers = ['Período','Órgão','Responsável','E-mail','Tipo','Resultado','Indicador','Meta 2027','Meta 2026','Valor Alcançado','Projeto','Fase','% Execução','Manual?','PPA/LOA','Fonte','Rec. Previsto','Rec. Executado','MAPA_ID','MAPA_Problema','MAPA_Providência','MAPA_Status','Qualitativos'];
+    var headers = ['Período','Órgão','Responsável','E-mail','Tipo','Resultado','Indicador','Meta 2027','Meta para este ano','Valor Alcançado','Projeto','Fase','% Execução','Manual?','PPA/LOA','Fontes (Previsto/Executado)','MAPA_ID','MAPA_Problema','MAPA_Providência','MAPA_Status','Qualitativos'];
     var csv = headers.join(';') + '\n';
     document.querySelectorAll('#resultados-container .item-box').forEach(function(box){
         var id = box.id.replace('res-box-', '');
@@ -899,8 +1038,8 @@ function baixarExcel() {
         if (!res) return;
         var info = document.getElementById('res-info-' + id).value.replace(/(\r\n|\n|\r)/gm, ' ');
         var inds = box.querySelectorAll('.indicador-box');
-        if (inds.length === 0) { csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, '','','','','','','','','','','','','','','','', info].join(';') + '\n'; }
-        else { inds.forEach(function(indBox){ var idInd = indBox.id.replace('ind-box-', ''); csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, document.getElementById('ind-nome-' + idInd).value, document.getElementById('ind-meta2027-' + idInd).value, document.getElementById('ind-meta2026-' + idInd).value, document.getElementById('ind-valor-' + idInd).value, '','','','','','','','','','','','', info].join(';') + '\n'; }); }
+        if (inds.length === 0) { csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, '','','','','','','','','','','','','','','', info].join(';') + '\n'; }
+        else { inds.forEach(function(indBox){ var idInd = indBox.id.replace('ind-box-', ''); csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, document.getElementById('ind-nome-' + idInd).value, document.getElementById('ind-meta2027-' + idInd).value, document.getElementById('ind-meta2026-' + idInd).value, document.getElementById('ind-valor-' + idInd).value, '','','','','','','','','','','', info].join(';') + '\n'; }); }
     });
     document.querySelectorAll('#projetos-container .item-box').forEach(function(box){
         var idp = box.id.replace('proj-box-', '');
@@ -913,14 +1052,26 @@ function baixarExcel() {
         var mel = document.getElementById('proj-melhoria-' + idp).value.replace(/(\r\n|\n|\r)/gm, ' ');
         var acoes = document.getElementById('proj-acoes-' + idp).value.replace(/(\r\n|\n|\r)/gm, ' ');
         var qual = 'Dif: ' + (dif || '-') + ' | Mel: ' + (mel || '-') + ' | Ações: ' + (acoes || '-');
-        var acaoBoxes = box.querySelectorAll('.acao-box');
-        if (acaoBoxes.length === 0) { csv += [periodoReferencia, orgao, responsavel, email, 'Projeto','','','','','', proj, fase, pct, isManual ? 'Sim' : 'Não', '','','','','','','','', qual].join(';') + '\n'; }
-        else { acaoBoxes.forEach(function(acaoBox){ var idA = acaoBox.id.replace('acao-box-', ''); csv += [periodoReferencia, orgao, responsavel, email, 'Projeto','','','','','', proj, fase, pct, isManual ? 'Sim' : 'Não', document.getElementById('acao-ppa-' + idA).value, document.getElementById('acao-fonte-' + idA).value, document.getElementById('acao-prev-' + idA).value, document.getElementById('acao-exec-' + idA).value, '','','','', qual].join(';') + '\n'; }); }
+        var acaoBox = box.querySelector('.acao-box');
+        var ppa = '', fontesTxt = '';
+        if (acaoBox) {
+            var idA = acaoBox.id.replace('acao-box-', '');
+            ppa = document.getElementById('acao-ppa-' + idA).value;
+            acaoBox.querySelectorAll('.fonte-box').forEach(function(fb) {
+                var inputs = fb.querySelectorAll('input');
+                var inputFonte = fb.querySelector('input[id^="acao-fonte-sel-"]');
+                var prev = inputs[0] ? inputs[0].value : '';
+                var exec = inputs[1] ? inputs[1].value : '';
+                var codFonte = inputFonte ? inputFonte.value : '';
+                if (codFonte) fontesTxt += codFonte + ': ' + prev + ' / ' + exec + ' | ';
+            });
+        }
+        csv += [periodoReferencia, orgao, responsavel, email, 'Projeto','','','','','', proj, fase, pct, isManual ? 'Sim' : 'Não', ppa, fontesTxt, '','','','', qual].join(';') + '\n';
     });
     MAPA_CADASTRO_ADMIN.filter(function(p){ return p.unidade === orgao; }).forEach(function(p){
         var prov = document.getElementById('mapa-prov-' + p.id) ? document.getElementById('mapa-prov-' + p.id).value.replace(/(\r\n|\n|\r)/gm, ' ') : '';
         var stat = document.getElementById('mapa-status-' + p.id) ? document.getElementById('mapa-status-' + p.id).value : '';
-        csv += [periodoReferencia, orgao, responsavel, email, 'MAPA','','','','','','','','','','','','','', p.id, p.problema, prov, stat, ''].join(';') + '\n';
+        csv += [periodoReferencia, orgao, responsavel, email, 'MAPA','','','','','','','','','','','','', p.id, p.problema, prov, stat, ''].join(';') + '\n';
     });
     var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     var link = document.createElement('a');
@@ -935,7 +1086,8 @@ function enviarParaGoogle() {
     var responsavel = document.getElementById('responsavel').value.trim();
     var email = document.getElementById('email').value.trim();
     if (!responsavel || !email) return alert('Preencha Responsável e E-mail.');
-    var dados = { orgao: orgao, responsavel: responsavel, email: email, periodo: periodoReferencia, resultados: [], projetos: [], mapa: [] };
+    var oficioEnvio = document.getElementById('oficioEnvio').value.trim();
+    var dados = { orgao: orgao, responsavel: responsavel, email: email, periodo: periodoReferencia, oficio_envio: oficioEnvio, oficio_resposta: '', resultados: [], projetos: [], mapa: [] };
     document.querySelectorAll('#resultados-container .item-box').forEach(function(box){
         var id = box.id.replace('res-box-','');
         var res = document.getElementById('res-resultado-'+id).value;
@@ -951,14 +1103,26 @@ function enviarParaGoogle() {
         var isManual = document.getElementById('tap-manual-check-'+id).checked;
         var pct = isManual ? document.getElementById('tap-manual-val-'+id).value + '%' : document.getElementById('tap-progress-'+id).textContent;
         var acoes = [];
-        box.querySelectorAll('.acao-box').forEach(function(acaoBox){ var idAcao = acaoBox.id.replace('acao-box-',''); acoes.push({ ppa: document.getElementById('acao-ppa-'+idAcao).value, fonte: document.getElementById('acao-fonte-'+idAcao).value, recursoPrev: document.getElementById('acao-prev-'+idAcao).value, recursoExec: document.getElementById('acao-exec-'+idAcao).value }); });
+        box.querySelectorAll('.acao-box').forEach(function(acaoBox){
+            var idAcao = acaoBox.id.replace('acao-box-','');
+            var ppa = document.getElementById('acao-ppa-'+idAcao).value;
+            var fontes = [];
+            acaoBox.querySelectorAll('.fonte-box').forEach(function(fb, idx) {
+                var inputs = fb.querySelectorAll('input');
+                var inputFonte = fb.querySelector('input[id^="acao-fonte-sel-"]');
+                var labelFonte = fb.querySelector('div[style*="font-size:0.85em"]');
+                var prev = inputs[0] ? inputs[0].value : '';
+                var exec = inputs[1] ? inputs[1].value : '';
+                var codFonte = labelFonte ? labelFonte.textContent.replace('Fonte: ', '') : (inputFonte ? inputFonte.value : '');
+                if (codFonte) fontes.push({ codigo: codFonte, previsto: parseCurrency(prev), executado: parseCurrency(exec) });
+            });
+            acoes.push({ ppa: ppa, fontes: fontes });
+        });
         dados.projetos.push({ nome: proj, fase: document.getElementById('tap-fase-'+id).value, tarefaAtual: isManual ? document.getElementById('tap-atual-'+id).value : '', proximaTarefa: isManual ? document.getElementById('tap-proxima-'+id).value : '', progresso: pct, manual: isManual ? "Sim" : "Não", dificuldade: document.getElementById('proj-dificuldade-'+id).value, melhoria: document.getElementById('proj-melhoria-'+id).value, acoesNecessarias: document.getElementById('proj-acoes-'+id).value, acoes: acoes });
     });
     MAPA_CADASTRO_ADMIN.filter(function(p){ return p.unidade === orgao; }).forEach(function(p){ if(document.getElementById('mapa-prov-' + p.id)) { dados.mapa.push({ id_mapa: p.id, problema: p.problema, providencia: document.getElementById('mapa-prov-' + p.id).value.trim(), status_unidade: document.getElementById('mapa-status-' + p.id).value }); } });
     var formData = new URLSearchParams();
-    formData.append('token', TOKEN_ACESSO);
-    formData.append('tipo', 'submissao');
-    formData.append('dados_json', JSON.stringify(dados));
+    formData.append('token', TOKEN_ACESSO); formData.append('tipo', 'submissao'); formData.append('dados_json', JSON.stringify(dados));
     var status = document.getElementById('statusCarregamento');
     status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Enviando...';
     fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
