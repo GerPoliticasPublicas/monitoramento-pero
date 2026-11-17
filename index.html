@@ -937,7 +937,10 @@ function gerarResumo() {
     var tratamento = destinatarioGenero === "F" ? "a Senhora" : "o Senhor";
     var saudacao = destinatarioGenero === "F" ? "Senhora Secretária" : "Senhor Secretário";
     var enderecamento = '<div class="enderecamento"><p>À Sua Excelência, ' + tratamento + ',</p><p class="destinatario-nome">' + escapeHtml(destinatarioNome) + '</p><p class="destinatario-cargo">' + escapeHtml(destinatarioCargo) + '</p></div>';
+    
     var textoOficio = enderecamento + '<p class="recuo-tab"><strong>Assunto: Informações quadrimestrais dos indicadores de resultado do Planejamento Estratégico.</strong></p><p class="recuo-tab">' + saudacao + ',</p><p>Com cordiais cumprimentos, vimos por meio deste encaminhar as informações atualizadas referentes ao monitoramento do Plano Estratégico do Estado de Rondônia, relativas ao <strong>' + periodoReferencia + '</strong>, conforme solicitado no Ofício nº ' + escapeHtml(oficioParaUsar) + '.</p><p>As informações prestadas pela unidade <strong>' + orgao + '</strong> encontram-se detalhadas nas tabelas abaixo:</p>';
+    
+    // Tabela de Resultados
     var tabelaResultados = '<thead><tr><th>Resultados</th><th>Indicador</th><th>Meta 2027</th><th>Meta para este ano</th><th>Valor Alcançado</th><th>Informações Qualitativas</th></tr></thead><tbody>';
     document.querySelectorAll('#resultados-container .item-box').forEach(function(box){
         var id = box.id.replace('res-box-', '');
@@ -945,41 +948,83 @@ function gerarResumo() {
         var info = document.getElementById('res-info-' + id).value.trim();
         if (!res) return;
         var indBoxes = box.querySelectorAll('.indicador-box');
-        if (indBoxes.length === 0) { tabelaResultados += '<tr><td>' + escapeHtml(res) + '</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td>' + (info ? escapeHtml(info) : '-') + '</td></tr>'; }
-        else { indBoxes.forEach(function(indBox, k){ var idInd = indBox.id.replace('ind-box-', ''); tabelaResultados += '<tr><td>' + (k === 0 ? escapeHtml(res) : '') + '</td><td>' + escapeHtml(document.getElementById('ind-nome-' + idInd).value) + '</td><td>' + escapeHtml(document.getElementById('ind-meta2027-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-meta2026-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-valor-' + idInd).value) + '</td><td>' + (k === 0 ? (info ? escapeHtml(info) : '-') : '') + '</td></tr>'; }); }
+        if (indBoxes.length === 0) { 
+            tabelaResultados += '<tr><td>' + escapeHtml(res) + '</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td class="center">-</td><td>' + (info ? escapeHtml(info) : '-') + '</td></tr>'; 
+        } else { 
+            indBoxes.forEach(function(indBox, k){ 
+                var idInd = indBox.id.replace('ind-box-', ''); 
+                tabelaResultados += '<tr><td>' + (k === 0 ? escapeHtml(res) : '') + '</td><td>' + escapeHtml(document.getElementById('ind-nome-' + idInd).value) + '</td><td>' + escapeHtml(document.getElementById('ind-meta2027-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-meta2026-' + idInd).value) + '</td><td class="center">' + escapeHtml(document.getElementById('ind-valor-' + idInd).value) + '</td><td>' + (k === 0 ? (info ? escapeHtml(info) : '-') : '') + '</td></tr>'; 
+            }); 
+        }
     });
     tabelaResultados += '</tbody>';
+
+        // Tabela de Projetos (CORREÇÃO CIRÚRGICA POR ID)
     var tabelaProjetos = '<thead><tr><th>Projeto</th><th>Fase / %</th><th>PPA/LOA</th><th>Fontes (Previsto / Executado)</th><th>Qualitativos</th></tr></thead><tbody>';
     var temProjeto = false;
+    
     document.querySelectorAll('#projetos-container .item-box').forEach(function(box){
         var idp = box.id.replace('proj-box-', '');
         var proj = document.getElementById('proj-nome-' + idp).value;
         if (!proj) return;
         temProjeto = true;
+        
         var isManual = document.getElementById('tap-manual-check-' + idp).checked;
         var fasePct = isManual ? 'Manual (' + document.getElementById('tap-manual-val-' + idp).value + '%)' : document.getElementById('tap-fase-' + idp).options[document.getElementById('tap-fase-' + idp).selectedIndex].text + ' (' + document.getElementById('tap-progress-' + idp).textContent + ')';
+        
         var dif = document.getElementById('proj-dificuldade-' + idp).value.trim();
         var mel = document.getElementById('proj-melhoria-' + idp).value.trim();
         var acoes = document.getElementById('proj-acoes-' + idp).value.trim();
         var qual = 'Dif: ' + (dif || '-') + '<br>Mel: ' + (mel || '-') + '<br>Ações: ' + (acoes || '-');
-        var acaoBox = box.querySelector('.acao-box');
-        var ppa = '', fontesTxt = '';
-        if (acaoBox) {
+        
+        var ppaArray = [];
+        var fontesArray = [];
+        
+        // Varre TODAS as ações orçamentárias do projeto
+        box.querySelectorAll('.acao-box').forEach(function(acaoBox) {
             var idA = acaoBox.id.replace('acao-box-', '');
-            ppa = document.getElementById('acao-ppa-' + idA).value;
+            
+            // 1. Pega o PPA
+            var ppaVal = document.getElementById('acao-ppa-' + idA) ? document.getElementById('acao-ppa-' + idA).value : '';
+            if(ppaVal) ppaArray.push(ppaVal);
+            
+            // 2. Varre TODAS as fontes desta ação
             acaoBox.querySelectorAll('.fonte-box').forEach(function(fb) {
-                var inputs = fb.querySelectorAll('input');
-                var inputFonte = fb.querySelector('input[id^="acao-fonte-sel-"]');
+                // Identifica se é fonte do modo ADMIN ou do modo MANUAL (Extra)
                 var labelFonte = fb.querySelector('div[style*="font-size:0.85em"]');
-                var prev = inputs[0] ? inputs[0].value : '';
-                var exec = inputs[1] ? inputs[1].value : '';
-                var codFonte = labelFonte ? labelFonte.textContent.replace('Fonte: ', '') : (inputFonte ? inputFonte.value : '');
-                if (codFonte) fontesTxt += codFonte + ': ' + prev + ' / ' + exec + '<br>';
+                var inputFonteLivre = fb.querySelector('input[id^="acao-fonte-sel-"]');
+                
+                var codFonte = '';
+                if (labelFonte) {
+                    // Modo Admin: Pega o texto de dentro da div (ex: "Fonte: 15000/...")
+                    codFonte = labelFonte.textContent.replace('Fonte:', '').trim();
+                } else if (inputFonteLivre) {
+                    // Modo Manual: Pega o valor digitado no input de seleção
+                    codFonte = inputFonteLivre.value.trim();
+                }
+                
+                // 3. Pega os valores de Previsto e Executado buscando pelo ID que criamos na função adicionarAcaoOrcamentaria
+                var idFonte = fb.querySelector('input[id^="acao-fonte-exec-"]').id.replace('acao-fonte-exec-', '');
+                var inputPrev = document.getElementById('acao-fonte-prev-' + idFonte);
+                var inputExec = document.getElementById('acao-fonte-exec-' + idFonte);
+                
+                var prev = inputPrev ? inputPrev.value : '0,00';
+                var exec = inputExec ? inputExec.value : '0,00';
+                
+                if (codFonte) {
+                    fontesArray.push(codFonte + ': ' + prev + ' / ' + exec);
+                }
             });
-        }
-        tabelaProjetos += '<tr><td>' + escapeHtml(proj) + '</td><td class="center">' + fasePct + '</td><td>' + escapeHtml(ppa) + '</td><td>' + fontesTxt + '</td><td>' + qual + '</td></tr>';
+        });
+        
+        var ppaTxt = ppaArray.length > 0 ? ppaArray.join('<br>') : '-';
+        var fontesTxt = fontesArray.length > 0 ? fontesArray.join('<br>') : '-';
+
+        tabelaProjetos += '<tr><td>' + escapeHtml(proj) + '</td><td class="center">' + fasePct + '</td><td>' + ppaTxt + '</td><td>' + fontesTxt + '</td><td>' + qual + '</td></tr>';
     });
     tabelaProjetos += '</tbody>';
+
+    // Tabela MAPA
     var tabelaMAPA = '<thead><tr><th>ID</th><th>Problema</th><th>Providência</th><th>Status</th></tr></thead><tbody>';
     var temMAPA = false;
     MAPA_CADASTRO_ADMIN.filter(function(p){ return p.unidade === orgao; }).forEach(function(p){
@@ -989,7 +1034,9 @@ function gerarResumo() {
         tabelaMAPA += '<tr><td class="center">' + p.id + '</td><td>' + escapeHtml(p.problema) + '</td><td>' + (prov ? escapeHtml(prov) : '-') + '</td><td class="center">' + escapeHtml(stat) + '</td></tr>';
     });
     tabelaMAPA += '</tbody>';
+    
     var fechamento = '<br><br><p>Respeitosamente,</p><br><br><p style="text-align:center; margin:0;">XXXXXXXXXXXXXXXXXXXXXXXXX</p><p style="text-align:center; margin:0;">XXXXXXXXXXXXXXXXXXXXXXXX- ' + orgao + '</p>';
+    
     document.getElementById('texto-oficio').innerHTML = textoOficio;
     document.getElementById('tabela-resultados').innerHTML = tabelaResultados;
     document.getElementById('tabela-projetos').innerHTML = tabelaProjetos;
@@ -998,6 +1045,7 @@ function gerarResumo() {
     document.getElementById('tituloTabelaMAPA').style.display = temMAPA ? 'block' : 'none';
     document.getElementById('tabela-mapa').style.display = temMAPA ? 'table' : 'none';
     if(temMAPA) document.getElementById('tabela-mapa').innerHTML = tabelaMAPA;
+    
     var fechExist = document.getElementById('fechamento-oficio');
     if (fechExist) fechExist.parentNode.removeChild(fechExist);
     var divFech = document.createElement('div');
@@ -1007,6 +1055,7 @@ function gerarResumo() {
     divFech.style.fontSize = '1.05em';
     divFech.innerHTML = fechamento;
     document.getElementById('tabela-projetos').parentNode.parentNode.appendChild(divFech);
+    
     document.getElementById('resultado-area').style.display = 'block';
     document.getElementById('resultado-area').scrollIntoView({ behavior: 'smooth' });
 }
@@ -1032,19 +1081,28 @@ function baixarExcel() {
     var email = document.getElementById('email').value.trim();
     var headers = ['Período','Órgão','Responsável','E-mail','Tipo','Resultado','Indicador','Meta 2027','Meta para este ano','Valor Alcançado','Projeto','Fase','% Execução','Manual?','PPA/LOA','Fontes (Previsto/Executado)','MAPA_ID','MAPA_Problema','MAPA_Providência','MAPA_Status','Qualitativos'];
     var csv = headers.join(';') + '\n';
+    
     document.querySelectorAll('#resultados-container .item-box').forEach(function(box){
         var id = box.id.replace('res-box-', '');
         var res = document.getElementById('res-resultado-' + id).value;
         if (!res) return;
         var info = document.getElementById('res-info-' + id).value.replace(/(\r\n|\n|\r)/gm, ' ');
         var inds = box.querySelectorAll('.indicador-box');
-        if (inds.length === 0) { csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, '','','','','','','','','','','','','','','', info].join(';') + '\n'; }
-        else { inds.forEach(function(indBox){ var idInd = indBox.id.replace('ind-box-', ''); csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, document.getElementById('ind-nome-' + idInd).value, document.getElementById('ind-meta2027-' + idInd).value, document.getElementById('ind-meta2026-' + idInd).value, document.getElementById('ind-valor-' + idInd).value, '','','','','','','','','','','', info].join(';') + '\n'; }); }
+        if (inds.length === 0) { 
+            csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, '','','','','','','','','','','','','','','', info].join(';') + '\n'; 
+        } else { 
+            inds.forEach(function(indBox){ 
+                var idInd = indBox.id.replace('ind-box-', ''); 
+                csv += [periodoReferencia, orgao, responsavel, email, 'Resultado', res, document.getElementById('ind-nome-' + idInd).value, document.getElementById('ind-meta2027-' + idInd).value, document.getElementById('ind-meta2026-' + idInd).value, document.getElementById('ind-valor-' + idInd).value, '','','','','','','','','','','', info].join(';') + '\n'; 
+            }); 
+        }
     });
+    
     document.querySelectorAll('#projetos-container .item-box').forEach(function(box){
         var idp = box.id.replace('proj-box-', '');
         var proj = document.getElementById('proj-nome-' + idp).value;
         if (!proj) return;
+        
         var isManual = document.getElementById('tap-manual-check-' + idp).checked;
         var pct = isManual ? document.getElementById('tap-manual-val-' + idp).value + '%' : document.getElementById('tap-progress-' + idp).textContent;
         var fase = document.getElementById('tap-fase-' + idp).value;
@@ -1052,27 +1110,53 @@ function baixarExcel() {
         var mel = document.getElementById('proj-melhoria-' + idp).value.replace(/(\r\n|\n|\r)/gm, ' ');
         var acoes = document.getElementById('proj-acoes-' + idp).value.replace(/(\r\n|\n|\r)/gm, ' ');
         var qual = 'Dif: ' + (dif || '-') + ' | Mel: ' + (mel || '-') + ' | Ações: ' + (acoes || '-');
-        var acaoBox = box.querySelector('.acao-box');
-        var ppa = '', fontesTxt = '';
-        if (acaoBox) {
+        
+        var ppaArray = [];
+        var fontesArray = [];
+        
+        // Correção idêntica à do Ofício
+        box.querySelectorAll('.acao-box').forEach(function(acaoBox) {
             var idA = acaoBox.id.replace('acao-box-', '');
-            ppa = document.getElementById('acao-ppa-' + idA).value;
+            var ppaVal = document.getElementById('acao-ppa-' + idA) ? document.getElementById('acao-ppa-' + idA).value : '';
+            if(ppaVal) ppaArray.push(ppaVal);
+            
             acaoBox.querySelectorAll('.fonte-box').forEach(function(fb) {
-                var inputs = fb.querySelectorAll('input');
-                var inputFonte = fb.querySelector('input[id^="acao-fonte-sel-"]');
-                var prev = inputs[0] ? inputs[0].value : '';
-                var exec = inputs[1] ? inputs[1].value : '';
-                var codFonte = inputFonte ? inputFonte.value : '';
-                if (codFonte) fontesTxt += codFonte + ': ' + prev + ' / ' + exec + ' | ';
+                var labelFonte = fb.querySelector('div[style*="font-size:0.85em"]');
+                var inputFonteLivre = fb.querySelector('input[id^="acao-fonte-sel-"]');
+                
+                var codFonte = '';
+                if (labelFonte) {
+                    codFonte = labelFonte.textContent.replace('Fonte:', '').trim();
+                } else if (inputFonteLivre) {
+                    codFonte = inputFonteLivre.value.trim();
+                }
+                
+                var idFonte = fb.querySelector('input[id^="acao-fonte-exec-"]').id.replace('acao-fonte-exec-', '');
+                var inputPrev = document.getElementById('acao-fonte-prev-' + idFonte);
+                var inputExec = document.getElementById('acao-fonte-exec-' + idFonte);
+                
+                var prev = inputPrev ? inputPrev.value : '0,00';
+                var exec = inputExec ? inputExec.value : '0,00';
+                
+                if (codFonte) {
+                    fontesArray.push(codFonte + ': ' + prev + ' / ' + exec);
+                }
             });
-        }
-        csv += [periodoReferencia, orgao, responsavel, email, 'Projeto','','','','','', proj, fase, pct, isManual ? 'Sim' : 'Não', ppa, fontesTxt, '','','','', qual].join(';') + '\n';
+        });
+        
+        // Para o CSV, usamos " | " para separar as fontes e ações na mesma célula, evitando quebrar a linha
+        var ppaTxt = ppaArray.length > 0 ? ppaArray.join(' | ') : '';
+        var fontesTxt = fontesArray.length > 0 ? fontesArray.join(' | ') : '';
+
+        csv += [periodoReferencia, orgao, responsavel, email, 'Projeto','','','','','', proj, fase, pct, isManual ? 'Sim' : 'Não', ppaTxt, fontesTxt, '','','','', qual].join(';') + '\n';
     });
+    
     MAPA_CADASTRO_ADMIN.filter(function(p){ return p.unidade === orgao; }).forEach(function(p){
         var prov = document.getElementById('mapa-prov-' + p.id) ? document.getElementById('mapa-prov-' + p.id).value.replace(/(\r\n|\n|\r)/gm, ' ') : '';
         var stat = document.getElementById('mapa-status-' + p.id) ? document.getElementById('mapa-status-' + p.id).value : '';
         csv += [periodoReferencia, orgao, responsavel, email, 'MAPA','','','','','','','','','','','','', p.id, p.problema, prov, stat, ''].join(';') + '\n';
     });
+    
     var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     var link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -1087,48 +1171,112 @@ function enviarParaGoogle() {
     var email = document.getElementById('email').value.trim();
     if (!responsavel || !email) return alert('Preencha Responsável e E-mail.');
     var oficioEnvio = document.getElementById('oficioEnvio').value.trim();
+    
     var dados = { orgao: orgao, responsavel: responsavel, email: email, periodo: periodoReferencia, oficio_envio: oficioEnvio, oficio_resposta: '', resultados: [], projetos: [], mapa: [] };
+    
     document.querySelectorAll('#resultados-container .item-box').forEach(function(box){
         var id = box.id.replace('res-box-','');
         var res = document.getElementById('res-resultado-'+id).value;
         if(!res) return;
         var inds = [];
-        box.querySelectorAll('.indicador-box').forEach(function(indBox){ var idInd = indBox.id.replace('ind-box-',''); inds.push({ nome: document.getElementById('ind-nome-'+idInd).value, meta2027: document.getElementById('ind-meta2027-'+idInd).value, meta2026: document.getElementById('ind-meta2026-'+idInd).value, valor: document.getElementById('ind-valor-'+idInd).value }); });
+        box.querySelectorAll('.indicador-box').forEach(function(indBox){ 
+            var idInd = indBox.id.replace('ind-box-',''); 
+            inds.push({ nome: document.getElementById('ind-nome-'+idInd).value, meta2027: document.getElementById('ind-meta2027-'+idInd).value, meta2026: document.getElementById('ind-meta2026-'+idInd).value, valor: document.getElementById('ind-valor-'+idInd).value }); 
+        });
         dados.resultados.push({ resultado: res, indicadores: inds, infoQual: document.getElementById('res-info-'+id).value });
     });
+    
     document.querySelectorAll('#projetos-container .item-box').forEach(function(box){
         var id = box.id.replace('proj-box-','');
         var proj = document.getElementById('proj-nome-'+id).value;
         if(!proj) return;
+        
         var isManual = document.getElementById('tap-manual-check-'+id).checked;
         var pct = isManual ? document.getElementById('tap-manual-val-'+id).value + '%' : document.getElementById('tap-progress-'+id).textContent;
         var acoes = [];
+        
+        // Correção cirúrgica idêntica para o envio ao Google
         box.querySelectorAll('.acao-box').forEach(function(acaoBox){
             var idAcao = acaoBox.id.replace('acao-box-','');
-            var ppa = document.getElementById('acao-ppa-'+idAcao).value;
+            var ppa = document.getElementById('acao-ppa-'+idAcao) ? document.getElementById('acao-ppa-'+idAcao).value : '';
             var fontes = [];
-            acaoBox.querySelectorAll('.fonte-box').forEach(function(fb, idx) {
-                var inputs = fb.querySelectorAll('input');
-                var inputFonte = fb.querySelector('input[id^="acao-fonte-sel-"]');
+            
+            acaoBox.querySelectorAll('.fonte-box').forEach(function(fb) {
                 var labelFonte = fb.querySelector('div[style*="font-size:0.85em"]');
-                var prev = inputs[0] ? inputs[0].value : '';
-                var exec = inputs[1] ? inputs[1].value : '';
-                var codFonte = labelFonte ? labelFonte.textContent.replace('Fonte: ', '') : (inputFonte ? inputFonte.value : '');
-                if (codFonte) fontes.push({ codigo: codFonte, previsto: parseCurrency(prev), executado: parseCurrency(exec) });
+                var inputFonteLivre = fb.querySelector('input[id^="acao-fonte-sel-"]');
+                
+                var codFonte = '';
+                if (labelFonte) {
+                    codFonte = labelFonte.textContent.replace('Fonte:', '').trim();
+                } else if (inputFonteLivre) {
+                    codFonte = inputFonteLivre.value.trim();
+                }
+                
+                var idFonte = fb.querySelector('input[id^="acao-fonte-exec-"]').id.replace('acao-fonte-exec-', '');
+                var inputPrev = document.getElementById('acao-fonte-prev-' + idFonte);
+                var inputExec = document.getElementById('acao-fonte-exec-' + idFonte);
+                
+                var prev = inputPrev ? inputPrev.value : '0,00';
+                var exec = inputExec ? inputExec.value : '0,00';
+                
+                if (codFonte) {
+                    fontes.push({ codigo: codFonte, previsto: parseCurrency(prev), executado: parseCurrency(exec) });
+                }
             });
-            acoes.push({ ppa: ppa, fontes: fontes });
+            
+            if(ppa || fontes.length > 0) {
+                acoes.push({ ppa: ppa, fontes: fontes });
+            }
         });
-        dados.projetos.push({ nome: proj, fase: document.getElementById('tap-fase-'+id).value, tarefaAtual: isManual ? document.getElementById('tap-atual-'+id).value : '', proximaTarefa: isManual ? document.getElementById('tap-proxima-'+id).value : '', progresso: pct, manual: isManual ? "Sim" : "Não", dificuldade: document.getElementById('proj-dificuldade-'+id).value, melhoria: document.getElementById('proj-melhoria-'+id).value, acoesNecessarias: document.getElementById('proj-acoes-'+id).value, acoes: acoes });
+        
+        dados.projetos.push({ 
+            nome: proj, 
+            fase: document.getElementById('tap-fase-'+id).value, 
+            tarefaAtual: isManual ? document.getElementById('tap-atual-'+id).value : '', 
+            proximaTarefa: isManual ? document.getElementById('tap-proxima-'+id).value : '', 
+            progresso: pct, 
+            manual: isManual ? "Sim" : "Não", 
+            dificuldade: document.getElementById('proj-dificuldade-'+id).value, 
+            melhoria: document.getElementById('proj-melhoria-'+id).value, 
+            acoesNecessarias: document.getElementById('proj-acoes-'+id).value, 
+            acoes: acoes 
+        });
     });
-    MAPA_CADASTRO_ADMIN.filter(function(p){ return p.unidade === orgao; }).forEach(function(p){ if(document.getElementById('mapa-prov-' + p.id)) { dados.mapa.push({ id_mapa: p.id, problema: p.problema, providencia: document.getElementById('mapa-prov-' + p.id).value.trim(), status_unidade: document.getElementById('mapa-status-' + p.id).value }); } });
+    
+    MAPA_CADASTRO_ADMIN.filter(function(p){ return p.unidade === orgao; }).forEach(function(p){ 
+        if(document.getElementById('mapa-prov-' + p.id)) { 
+            dados.mapa.push({ id_mapa: p.id, problema: p.problema, providencia: document.getElementById('mapa-prov-' + p.id).value.trim(), status_unidade: document.getElementById('mapa-status-' + p.id).value }); 
+        } 
+    });
+    
     var formData = new URLSearchParams();
-    formData.append('token', TOKEN_ACESSO); formData.append('tipo', 'submissao'); formData.append('dados_json', JSON.stringify(dados));
+    formData.append('token', TOKEN_ACESSO); 
+    formData.append('tipo', 'submissao'); 
+    formData.append('dados_json', JSON.stringify(dados));
+    
     var status = document.getElementById('statusCarregamento');
-    status.style.display = 'block'; status.className = 'status-sync status-info'; status.textContent = 'Enviando...';
+    status.style.display = 'block'; 
+    status.className = 'status-sync status-info'; 
+    status.textContent = 'Enviando para a SEPOG...';
+    
     fetch(URL_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
     .then(function(r){ return r.json(); })
-    .then(function(data){ if(data.result === 'success') { alert("✅ Enviado! ID: " + data.id_submissao); status.className = 'status-sync status-ok'; status.textContent = '✅ Enviado.'; } else { alert("Erro: " + data.message); } })
-    .catch(function(err){ alert("Erro: " + err.message); });
+    .then(function(data){ 
+        if(data.result === 'success') { 
+            alert("✅ Enviado com sucesso! ID: " + data.id_submissao); 
+            status.className = 'status-sync status-ok'; 
+            status.textContent = '✅ Enviado.'; 
+        } else { 
+            alert("Erro: " + data.message); 
+            status.className = 'status-sync status-erro';
+            status.textContent = 'Erro: ' + data.message;
+        } 
+    })
+    .catch(function(err){ 
+        alert("Erro: " + err.message); 
+        status.className = 'status-sync status-erro';
+        status.textContent = 'Erro: ' + err.message;
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
